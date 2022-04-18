@@ -1,6 +1,16 @@
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { MessageActionRow, MessageSelectMenu, 
+    MessageSelectMenuOptions,
+    APISelectMenuComponent,
+    MessageSelectOptionData,
+} = require('discord.js');
 const division = require("../Util/division");
 
+/**
+ * 
+ * @param { MessageSelectMenu | MessageSelectMenuOptions | APISelectMenuComponent} param0 
+ * @param  { MessageSelectOptionData[]} options 
+ * @returns 
+ */
 module.exports = function({
     customId, disabled, maxValues, minValues, placeholder
 }, ...options) {

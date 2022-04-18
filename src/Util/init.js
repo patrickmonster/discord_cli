@@ -21,11 +21,12 @@ function nocache(module, callback) {
  * @param {*} target
  */
 function load(client, target) {
+	const name = path.basename(target,".js");
 	try {
-		console.log(`[파일관리자] 파일등록- ${target}`);
-		const { name, excute } = require(target);
-		client[name] = function(...arges) {
-			try {return excute(client, ...arges);} catch (e) { console.error(`[명령실행오류] ${name}`); }
+		console.log(`[파일관리자] ${name} - ${target}`);
+		const func = require(target);
+		client[name] = function(...args) {
+			try {return func.call(client, ...args); } catch (e) { console.error(`[명령실행오류] ${name}`); }
 		};
 	} catch (e) {
 		console.log(`[파일관리자] 파일제거(경고)- ${target}`);
