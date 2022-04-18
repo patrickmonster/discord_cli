@@ -54,6 +54,11 @@ function loadCmd(command, map, dir) {
 	nocache(dir, reload);// 변경사항 등록
 }
 
+/**
+ * 커맨드 등록용
+ * @param {*} cmd 
+ * @returns 
+ */
 function getAppCommand(cmd){
 	let out = cmd;
 	switch(cmd.type){
