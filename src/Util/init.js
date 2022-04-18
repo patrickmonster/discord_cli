@@ -32,6 +32,12 @@ function load(client, target) {
 	}
 }
 
+/**
+ * 파일 관리자 - 파일 업데이트시 종료되지 않고 파일을 관리함
+ * @param {*} client 
+ * @param {*} target 
+ * @returns 
+ */
 module.exports = function(client, target) {
 	const commandFolders = fs.readdirSync(target).filter(file => file.endsWith('.js'));
 	for (const file of commandFolders) {

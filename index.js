@@ -1,5 +1,7 @@
+const discord_js = require("discord.js");
 const BasicClient = require("./src/BasicClient");
 
-
-module.BasicClient = BasicClient;
-
+module.exports = {
+    BasicClient,
+    ...discord_js,
+};
