@@ -5,10 +5,9 @@ const discordModals = require('discord-modals');
 const fs = require('fs');
 const path = require("path");
 
-const init = require('./Util/init');
-
 /* ============================================================================================ */
 const getCommands = require("./Util/getCommands");
+const init = require('./Util/init');
 
 class BasicClient extends Client{
     constructor(clientOptions){
@@ -24,9 +23,12 @@ class BasicClient extends Client{
             this.#getBaseEvents();
         else {
             fs.mkdirSync(baseDir);
-            this.logger("이벤트 폴더를 찾을 수 없어, 종료합니다...", baseDir);
+            this.logger.error("이벤트 폴더를 찾을 수 없어, 종료합니다...", baseDir);
             process.exit(1);
         }
+
+        if(process.env.DISCORD_TOKEN)
+            this.login(process.env.DISCORD_TOKEN).catch(this.logger.error)
     }
 
     /**
@@ -35,13 +37,13 @@ class BasicClient extends Client{
     #getBaseEvents(){
         const {command} = getCommands(path.join(process.cwd(),"event"));
         for (const key of command.keys()){
-            this.logger("Load event]",key);
+            this.logger.log("Load event]",key);
             this.on(key, (...l)=>{
                 const cmd = command.get(key);
                 try{
                     cmd(...l);
                 }catch(e){
-                    this.logger("err", e)
+                    this.logger.error(e)
                 }
             })
         }

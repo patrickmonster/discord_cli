@@ -41,9 +41,8 @@ function loadCmd(command, map, dir) {
 			console.log(`[파일관리자] 파일 ${module ? '업데이트' : '생성'} - ${dir}`);
 			command.set(name, cmd);// 명령 탐색용
 			map.set(dir, cmd);
-		}
-		catch (e) {
-			console.error(e);
+		}catch (e) {
+			console.error(e); // 파일 확인을 위하여, 오류를 출력하고 에러로 던짐
 			console.log(`[파일관리자] 파일 제거 - ${dir}`);
 			try{
 				map.delete(dir);
@@ -69,6 +68,13 @@ function getAppCommand(cmd){
 	}
 	return out;
 }
+function getAppHelp(cmd){
+	cmd.type == 1 ? {...cmd} : {
+		name : cmd.name,
+		description : cmd.description,
+		help : cmd.help,
+	};
+}
 /**
  * 커맨드 관리 모델
  * @param {*} target 탐색위치
@@ -81,23 +87,17 @@ module.exports = function getCommands(target) {
 		update: () => {
 			const commandFolders = fs.readdirSync(target).filter(file => file.endsWith('.js'));
 			for (const file of commandFolders) {
-				const path = `${target}${process.env.sep}${file}`;
+				const path = path.join(target, file);
 				if (!map.has(path)) {
 					loadCmd(command, map, path);
 				}
 			}
 		},
 		getApp(){
-			return [...this.command.values()].map((cmd)=>getAppCommand(cmd));
+			return [...this.command.values()].map(getAppCommand);
 		},
 		getHelp(){
-			return [...this.command.values()].map((cmd)=>{
-				return cmd.type == 1 ? {...cmd} : {
-					name : cmd.name,
-					description : cmd.description,
-					help : cmd.help,
-				};
-			})
+			return [...this.command.values()].map(getAppHelp);
 		},
 	};
 };

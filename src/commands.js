@@ -1,4 +1,4 @@
-const getCommands = require('./getCommands'); // 커맨드 관리자
+const getCommands = require('./Util/getCommands'); // 커맨드 관리자
 
 /**
  * 커맨드 관리 모델

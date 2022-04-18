@@ -6,8 +6,8 @@
 const levels = {
     'debug': 0,
     'warn': 1,
-    'error': 2,
-    'info': 3,
+    'info': 2,
+    'error': 3,
     'none': 4
 }
 
@@ -29,12 +29,15 @@ const log = lvl => {
     }
 }
 
-module.exports = {
-    setLevel: lvl => level = lvl,
-    setName: nam => name = nam,
-    debug: log('debug'),
-    error: log('error'),
-    warn: log('warn'),
-    info: log('info'),
-    log: log('none'),
+module.exports = (...args) => {
+    if (4 >= levels[level])
+        console.log(`${formattedDate()}]${name}`, ...args);
 }
+
+module.setLevel = lvl => level = lvl;
+module.setName = nam => name = nam;
+module.log = log('none');
+module.info = log('info');
+module.warn = log('warn');
+module.error = log('error');
+module.debug = log('debug');
