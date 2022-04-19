@@ -10,8 +10,8 @@
         "djs-cli" : "cli/index.js",
         "djs-sql" : "cli/sql.js"
     },
-    "keywords": [],
-    "author": "",
+    "keywords": ["discord.js","djs-cli","patrickmonster"],
+    "author": "patrickmonster",
     "license": "ISC",
     "dependencies": {
         "@discordjs/rest": "^0.4.1",

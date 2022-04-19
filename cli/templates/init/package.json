@@ -4,7 +4,7 @@
     "scripts": {
         "start" : "node discord.js"
     },
-    "keywords": [],
+    "keywords": ["discord.js","djs-cli","patrickmonster"],
     "author": "",
     "license": "ISC",
     "dependencies": {
