@@ -1,0 +1,15 @@
+{
+    "version": "1.0.0",
+    "main": "discord.js",
+    "scripts": {
+        "start" : "node discord.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@patrickmonster/discord_cli": "^1.0.3",
+        "discord.js": "^13.6.0"
+    }
+  }
+  

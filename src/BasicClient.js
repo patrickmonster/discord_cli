@@ -26,7 +26,7 @@ class BasicClient extends Client{
             this.logger.error("이벤트 폴더를 찾을 수 없어, 종료합니다...", baseDir);
             process.exit(1);
         }
-
+        
         if(process.env.DISCORD_TOKEN)
             this.login(process.env.DISCORD_TOKEN).catch(this.logger.error)
     }
@@ -36,12 +36,13 @@ class BasicClient extends Client{
      */
     #getBaseEvents(){
         const {command} = getCommands(path.join(process.cwd(),"event"));
+        const _this = this;
         for (const key of command.keys()){
-            this.logger.log("Load event]",key);
-            this.on(key, (...l)=>{
+            _this.logger.log("Load event]",key);
+            _this.on(key, (...l)=>{
                 const cmd = command.get(key);
                 try{
-                    cmd(...l);
+                    cmd.call(_this, ...l);
                 }catch(e){
                     this.logger.error(e)
                 }
