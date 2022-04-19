@@ -29,7 +29,6 @@ const choices = [
     // "테이블 삭제",
 ].map((name,value)=>typeof name == "string" ? {name,value} : name);
 
-console.log('‎')
 inquirer.prompt([{
     name: 'sql-work',
     type: 'list',
