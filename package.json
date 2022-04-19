@@ -6,6 +6,10 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
+    "bin" : {
+        "djs-cli" : "cli/index.js",
+        "djs-sql" : "cli/sql.js"
+    },
     "keywords": [],
     "author": "",
     "license": "ISC",
