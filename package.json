@@ -1,21 +1,24 @@
 {
-  "name": "@patrickmonster/discord_cli",
-  "version": "1.0.3",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@discordjs/rest": "^0.4.1",
-    "canvas": "^2.9.1",
-    "discord-api-types": "^0.31.1",
-    "discord-modals": "^1.3.5",
-    "discord.js": "^13.6.0",
-    "inquirer": "^8.2.2",
-    "lodash": "^4.17.21"
-  }
+    "name": "@patrickmonster/discord_cli",
+    "version": "1.0.3",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@discordjs/rest": "^0.4.1",
+        "discord-api-types": "^0.31.1",
+        "discord-modals": "^1.3.5",
+        "discord.js": "^13.6.0",
+        "inquirer": "^8.2.2",
+        "lodash": "^4.17.21",
+        "ncp": "^2.0.0",
+        "sequelize": "^6.19.0",
+        "sequelize-auto": "^0.8.8",
+        "sqlite3": "^5.0.4"
+    }
 }
