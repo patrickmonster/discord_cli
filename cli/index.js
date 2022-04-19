@@ -1,7 +1,12 @@
+'use strict';
+const { ClientEvents } = require("discord.js");
 const inquirer = require("inquirer");
 const fs = require("fs");
+const path = require("path");
 var { ncp } = require('ncp');
-const CHOICES = fs.readdirSync(`${__dirname}/templates`);
+// const CHOICES = fs.readdirSync(`${__dirname}/templates`);
+
+inquirer.registerPrompt('search-checkbox', require('inquirer-search-checkbox'));
 
 const { exec } = require('child_process');
 
@@ -14,6 +19,7 @@ console.log(`
 ╚═════╝ ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚═════╝ ╚══════╝ ╚═════╝╚══════╝╚═╝`);
 
 
+const eventList = ["rateLimit","invalidRequestWarning","apiResponse","apiRequest","ready","eprecated","applicationCommandCreate","eprecated","applicationCommandDelete","eprecated","applicationCommandUpdate","guildCreate","guildDelete","guildUpdate","inviteCreate","inviteDelete","guildUnavailable","guildMemberAdd","guildMemberRemove","guildMemberUpdate","guildMemberAvailable","guildMembersChunk","guildIntegrationsUpdate","roleCreate","roleDelete","roleUpdate","emojiCreate","emojiDelete","emojiUpdate","guildBanAdd","guildBanRemove","channelCreate","channelDelete","channelUpdate","channelPinsUpdate","messageCreate","messageDelete","messageUpdate","messageDeleteBulk","messageReactionAdd","messageReactionRemove","messageReactionRemoveAll","messageReactionRemoveEmoji","threadCreate","threadDelete","threadUpdate","threadListSync","threadMemberUpdate","threadMembersUpdate","userUpdate","presenceUpdate","voiceServerUpdate","voiceStateUpdate","typingStart","webhookUpdate","interactionCreate","error","warn","debug","cacheSweep","shardDisconnect","shardError","shardReconnecting","shardReady","shardResume","invalidated","raw","stageInstanceCreate","stageInstanceUpdate","stageInstanceDelete","stickerCreate","stickerDelete","stickerUpdate","guildScheduledEventCreate","guildScheduledEventUpdate","guildScheduledEventDelete","guildScheduledEventUserAdd","guildScheduledEventUserRemove"];
 
 console.log('‎')
 inquirer.prompt(
@@ -60,6 +66,26 @@ inquirer.prompt(
       });
       break;
     case 1:
+      inquirer.prompt({
+        name : "events",
+        message : "추가할 이벤트를 선택 해 주세요!",
+        type : "search-checkbox",
+        choices : eventList,
+      }).then(({events}) =>{
+        for(const event of events){
+          fs.writeFileSync(path.join(process.cwd(), "event", `${event}.js`), `
+'use strict';
+/**
+ * 
+ * @param {*} interaction 
+ * @returns 
+ */
+module.exports = function (error) {
+	this.logger.error(error);
+}
+          `);
+        }
+      });
       break;
     case 2:
       break;

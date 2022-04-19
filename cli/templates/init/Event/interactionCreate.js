@@ -1,4 +1,8 @@
-
+/**
+ * 
+ * @param {*} interaction 
+ * @returns 
+ */
 module.exports = (interaction) =>{
     if ( interaction.user.bot ) return;
 	const { customId: id, targetType } = interaction;
