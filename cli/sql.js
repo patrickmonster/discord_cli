@@ -22,8 +22,8 @@ const choices = [
     new inquirer.Separator(),
     new inquirer.Separator(),
     // "데이터 베이스 설정 변경",
-    "데이터 베이스 동기화(서버)",
-    "데이터 베이스 동기화(클라이언트)",
+    "데이터 베이스 동기화(클라이언트에 맞춤)",
+    "데이터 베이스 동기화(서버에 맞춤)",
     new inquirer.Separator(),
     // "테이블 생성",
     // "테이블 삭제",
@@ -105,12 +105,13 @@ inquirer.prompt([{
             }
             const { sequelize } = require("./templates/models/index");
             if(answers["sql-work"] == 3){ // 서버 동기화
-                console.log("동기화 시작...");
+                console.log("로컬파일 동기화 시작...")
                 sequelize.sync().then(data=>{
                     console.log("동기화가 완료되었습니다!", data);
                     process.exit(0);
                 }).catch(console.error);
             }else{
+                console.log("서버와 동기화 시작...")
                 const SequelizeAuto = require('sequelize-auto');
                 new SequelizeAuto(options.database, options.username, options.password, options).run(err=>{
                     if(err)console.error(err);

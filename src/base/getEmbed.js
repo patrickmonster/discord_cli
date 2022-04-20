@@ -1,7 +1,6 @@
 const { MessageEmbed } = require('discord.js');
 
 /**
- * 
  * @returns { MessageEmbed } MessageEmbed
  */
 module.exports = function() {

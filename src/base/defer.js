@@ -1,4 +1,9 @@
-
+const { Interaction } = require("discord.js");
+/**
+ * 
+ * @param { Interaction } interaction 
+ * @param { Function } target 
+ */
 module.exports = function(interaction, target) {
     interaction.deferReply({fetchReply : false, ephemeral: true}).then(()=>{
         target(interaction);

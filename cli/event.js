@@ -54,7 +54,7 @@ const eventList = {
     "debug": [" info", `
 	if (info.includes('Exceeded identify threshold')) {
 		const time = info.split(' ').pop();
-		this.logger.info("연결 지연중..." );
+		this.logger.info("연결 지연중...", time);
 	}
 	else if (info.includes('Session Limit Information')) {
 		this.logger.warn("Session Limit Information",  info.replace('[WS => Manager] Session Limit Information', ''));
@@ -141,7 +141,7 @@ const eventList = {
     "warn": [" info"],
     "webhookUpdate": [" channel"],
 
-    "modalSubmit" : [" modal"],
+    // "modalSubmit" : [" modal"],
 };
 
 function getType(type){
