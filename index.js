@@ -6,6 +6,10 @@ const BasicShard = require("./src/BasicShard");
 const LoadCommands = require("./src/commands");
 const CommandManager = require("./src/CommandManager");
 
+
+/**
+ * 
+ */
 module.exports = {
     BasicShard,
     BasicClient,
