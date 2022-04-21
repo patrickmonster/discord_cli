@@ -23,8 +23,8 @@ class BasicClient extends Client{
             this.#getBaseEvents();
         else {
             fs.mkdirSync(baseDir);
-            this.logger.error("이벤트 폴더를 찾을 수 없어, 종료합니다...", baseDir);
-            process.exit(1);
+            this.logger.error("이벤트 폴더를 찾을 수 없습니다!", baseDir);
+            require('../cli/event');
         }
         
         if(process.env.DISCORD_TOKEN)

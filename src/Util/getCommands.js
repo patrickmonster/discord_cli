@@ -82,6 +82,7 @@ function getAppHelp(cmd){
 }
 /**
  * 커맨드 관리 모델
+ *  - 대규모 명령 관리모듈
  * @param {*} target 탐색위치
  */
 module.exports = function getCommands(target) {

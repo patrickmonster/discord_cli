@@ -24,7 +24,7 @@ module.exports = function({
                 , maxValues
                 , minValues
                 , placeholder
-            }).addOptions(...options[i])
+            }).addOptions(...options[i])    
         );
     }
     return actionRow;
