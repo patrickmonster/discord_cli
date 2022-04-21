@@ -29,8 +29,8 @@ inquirer.prompt([
             "유저입력 명령",
             "메세지 명령",
             new inquirer.Separator(),
-            "슬레시커맨드 라우팅(명령 관리용 라우팅)",
-            "명령 라우팅(명령 관리용 라우팅)",
+            "슬레시커맨드 라우팅(하위 명령 관리용)",
+            "명령 라우팅(하위 명령 관리용)",
         ].map((name,value)=>typeof name == "string" ? {name,value} : name),
     },
 ]).then(({'command-name': name, 'command-type' : type }) => {
@@ -43,7 +43,7 @@ inquirer.prompt([
 const path = require("path");
 const name = path.basename(__filename,".js");
 
-${type == 1 ? '' : ''}
+${type == 1 ? sub : ''}
 
 /**
  * ${name}.js - 명령 이벤트
