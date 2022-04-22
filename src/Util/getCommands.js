@@ -89,7 +89,7 @@ module.exports = function getCommands(target) {
 	const { command, map } = load(target);
 	return {
 		command,
-		get: (cmd) => command.get(cmd) || command.find(c => c.aliases && c.aliases.includes(cmd)),
+		get: (cmd) => command.get(cmd) || command.find(c => (c.aliases && c.aliases.includes(cmd)) || (c.name && c.name == cmd)),
 		update: () => {
 			const commandFolders = fs.readdirSync(target).filter(file => file.endsWith('.js'));
 			for (const file of commandFolders) {
