@@ -186,8 +186,6 @@ ${param_data}
 * @returns 
 */
 module.exports = function ${event}(${params} ) {
-    const client = this;
-    this.logger.info(${params} );
     ${otherSorce || ""}
 }`);
         }
