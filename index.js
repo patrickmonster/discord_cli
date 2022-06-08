@@ -1,16 +1,14 @@
 const discord_js = require("discord.js");
-const discord_modal = require('discord-modals') // Modal class
 
-const BasicClient = require("./src/BasicClient");
-const LoadCommands = require("./src/commands");
-const LoadSubCommands = require("./src/Util/getCommands");
-const CommandManager = require("./src/CommandManager");
+const BasicClient = require("./src/Client");
+
+
+// 커맨드 로더 관리자 - 라이브 코딩
+const LoadCommands = require("./src/Util/updateCode");
+
 
 module.exports = {
-    BasicClient,
-    LoadCommands,
-    LoadSubCommands,
-    CommandManager,
-    ...discord_modal,
     ...discord_js,
+    Client : BasicClient,
+    LoadCommands,
 };

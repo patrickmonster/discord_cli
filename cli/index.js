@@ -17,8 +17,8 @@ inquirer.prompt({
   choices: [
     "프로젝트 생성",
     "클라이언트 이벤트 추가",
-    "데이터베이스 설정",
-    "데이터베이스 설정",
+    "보조 명령 추가",
+    // "데이터베이스 설정",
     new inquirer.Separator(),
   ].map((name, value) => typeof name == "string" ? { name, value } : name),
 }).then(answers => {

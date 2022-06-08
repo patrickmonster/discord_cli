@@ -1,8 +1,12 @@
 {
     "version": "1.0.0",
     "main": "discord.js",
+    "djs-cli" : {
+        "mode" : "development"
+    },
     "scripts": {
-        "start" : "node discord.js"
+        "start" : "node discord.js",
+        "cli" : "djs-cli"
     },
     "keywords": ["discord.js","djs-cli","patrickmonster"],
     "author": "",

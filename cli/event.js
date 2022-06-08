@@ -96,6 +96,7 @@ const eventList = {
         default: // 버튼 및 매뉴 이벤트
             if(interaction.isButton()){;}
             if(interaction.isSelectMenu()){;}
+            if(interaction.isModalSubmit()) {;}
     }`],
     "invalidated": [""], // invalidated
     "invalidRequestWarning": [" invalidRequestWarningData"],
@@ -159,7 +160,7 @@ const commandFolders = fs.readdirSync(baseDir)
 inquirer
     .prompt({
         name: "events",
-        message: "추가할 이벤트를 선택 해 주세요!",
+        message: "추가할 이벤트를 선택 해 주세요 :",
         type: "search-checkbox",
         choices: Object
             .keys(eventList)

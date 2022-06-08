@@ -11,21 +11,21 @@ const division = require("../Util/division");
  * @param  { MessageSelectOptionData[]} options 
  * @returns { MessageActionRow }
  */
-module.exports = function({
+ module.exports = ({
     customId, disabled, maxValues, minValues, placeholder
-}, ...options) {
-    options = division(options, 25);
-    const actionRow = new MessageActionRow();
+}, ...options) => {
+    options = division(options, 25);    
+    const components = [];
     for (const i in options){
-        actionRow.addComponents(
+        components.push(new MessageActionRow().addComponents(
             new MessageSelectMenu({
                 customId : `${customId} ${i}`
                 , disabled
-                , maxValues
+                , maxValues : maxValues > options[i].length ? options[i].length : maxValues 
                 , minValues
-                , placeholder
-            }).addOptions(...options[i])    
-        );
+                , placeholder // 기본 설명
+            }).addOptions(...options[i])
+        ))
     }
-    return actionRow;
-}
+    return components;
+};
