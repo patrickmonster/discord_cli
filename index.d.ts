@@ -1,19 +1,17 @@
 import {
     Client
+    , ShardingManager
+    , ShardingManagerOptions
+    , BitFieldResolvable
     , ApplicationCommand
     , Collection
     , ClientOptions
     , MessageSelectMenuOptions
     , MessageSelectOptionData
     , MessageActionRow
-    , MessageButton
     , MessageButtonOptions
     , MessageEmbed
 } from  'discord.js';
-import {
-  APIButtonComponent,
-} from 'discord-api-types/v9';
-
 
 declare module "discord.js";
 declare module "discord-modals";
@@ -43,6 +41,25 @@ interface GetCommand {
 //////////////////////////////////////////////////////
 export interface BasicClientOptions extends ClientOptions {
     eventDir? : string;
+}
+
+export interface AutoShardingOptions {
+    closeTimeout?: number;
+    makeCache?: String;
+    allowedMentions?: MessageMentionOptions;
+    invalidRequestWarningInterval?: number;
+    partials?: PartialTypes[];
+    restWsBridgeTimeout?: number;
+    restTimeOffset?: number;
+    restRequestTimeout?: number;
+    restGlobalRateLimit?: number;
+    restSweepInterval?: number;
+    retryLimit?: number;
+    failIfNotExists?: boolean;
+    userAgentSuffix?: string[];
+    presence?: PresenceData;
+    intents: BitFieldResolvable<number>;
+    waitGuildTimeout?: number;
 }
 
 export interface BasicTotalGuild {
@@ -75,17 +92,20 @@ export function LoadSubCommands(target: string): GetCommand;
 
 //////////////////////////////////////////////////////
 
-export class BasicClient extends Client {
+export class Client extends Client {
     public constructor(options: BasicClientOptions);
     getTotalGuild() : BasicTotalGuild; // 길드 인원수를 가져옴
     
     public logger : Logger;
     public logger(...args: any[]) : void;
-    public getMenu(data?: MessageSelectMenuOptions, ...options: MessageSelectOptionData[] | MessageSelectOptionData[][]): MessageActionRow;
-    public getIndexButton(length: number, index: number, ...options : MessageButtonStyles): MessageActionRow;
-    public getIndexButton(data?: MessageButton | MessageButtonOptions | APIButtonComponent): MessageActionRow;
+    public getMenu(data?: MessageSelectMenuOptions, ...options: MessageSelectOptionData[]): MessageActionRow[];
+    public getButton( ...options: MessageButtonOptions[]): MessageActionRow[];
+    public getIndexButton(length: number, index: number, ...options : MessageButtonStyles): MessageActionRow[];
     public getEmbed(): MessageEmbed;
     public defer(interaction: Interaction, target: (...args: any[]) => Awaitable<void>): void;
 }
 
-export function CommandManager(token: string, ...dirs : string[]): void;
+export interface AutoSharding extends ShardingManager {
+    public constructor(options: ShardingManagerOptions);
+    
+}

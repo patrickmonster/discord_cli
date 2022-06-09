@@ -4,7 +4,13 @@ const Client = require('./Client');
 
 
 class BaseShardingManager extends ShardingManager {
-    constructor(file, options) {
+    /**
+     * 
+     * @param { String } file 
+     * @param { ShardingManagerOptions } options 
+     * @param {*} clientOption 
+     */
+    constructor(options, clientOption) {
         super(file, options);
 
         // const _this = this;
@@ -17,4 +23,9 @@ class BaseShardingManager extends ShardingManager {
     run(port) { // express server
         
     }
+}
+
+
+module.exports = function createManager(options){
+
 }

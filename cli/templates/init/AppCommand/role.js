@@ -30,7 +30,6 @@ const name = path.basename(__filename,".js");
                     , maxValues : 25
                     , minValues : 0
                     , placeholder : `변경하실 역할을 선택 해 주세요!`
-                    // member.role.cache.has()
                 }, ...roles.cache.map((role,id) => {
                     const { id, name, hexColor, members} = role;
                     return {

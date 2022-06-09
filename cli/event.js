@@ -95,6 +95,7 @@ const eventList = {
             break;
         default: // 버튼 및 매뉴 이벤트
             if(interaction.isButton()){;}
+            if(interaction.isCommand()) {;}
             if(interaction.isSelectMenu()){;}
             if(interaction.isModalSubmit()) {;}
     }`],
