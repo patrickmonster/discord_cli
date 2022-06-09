@@ -25,15 +25,16 @@ CLI 기능 사용
 ```
 
 간편 사용을 목표로 하고 있습니다.
+
 주요기능
 
-빠른 디버깅 및 코딩을 위한
- 라이브코딩용 라이브러리 제공 
+빠른 디버깅 및 코딩을 위한 라이브코딩용 라이브러리 제공 
+
 discord 메세지를 간편하게 빌드 가능한 툴
-    getButton(), getMenu(), getEmbed()
+> getButton(), getMenu(), getEmbed()
 
 내부적인 로그 규칙
-    logger
+> logger
 
 
 빠른 클라이언트 이벤트 추가 및 주석지원
