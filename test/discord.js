@@ -6,4 +6,4 @@ const client = new BasicClient({
 
 client.on("ready", ()=>{
     client.logger(`${client.user.tag}`);
-}).login("OTQwNTg4OTczNTc3ODgzNjQ4.YgJlvg.Q9zIu5bTQgOQN59JudjaYqgtPDQ").catch(client.logger);
+}).login("").catch(client.logger);
