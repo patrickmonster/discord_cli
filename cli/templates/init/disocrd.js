@@ -1,11 +1,11 @@
 'use strict';
-const {BaseClient, Intents, LoadCommands }= require("@patrickmonster/discord_cli");
+const { Client, Intents, LoadCommands }= require("@patrickmonster/discord_cli");
 const path = require("path");
 
 const package = require("./package.json");
 process.env.DISCORD_TOKEN = process.env.DISCORD_TOKEN || package.token;
 
-const client = BaseClient({
+const client = Client({
 	intents : [
         Intents.FLAGS.DIRECT_MESSAGES,
         Intents.FLAGS.GUILDS, 

@@ -1,3 +1,4 @@
+'use strict';
 
 const path = require("path");
 const name = path.basename(__filename,".js");

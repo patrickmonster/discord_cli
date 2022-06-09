@@ -1,10 +1,10 @@
-const { Routes } = require('discord-api-types/v9');
 
-
+const path = require("path");
+const name = path.basename(__filename,".js");
 /**
  * 역할 지급
  */
-module.exports = (interaction, [role, parent]) => {
+module.exports = (interaction, role, parent, ...args) => {
     const { member } = interaction;
     member.roles.add(role).then(()=>{
         interaction.reply({
