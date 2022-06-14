@@ -90,6 +90,10 @@ function init(db){
     db.sql("SHOWTABLES", "SELECT * FROM sqlite_master WHERE type='table';").then(tableNames=>{
 		const dbInterface = db.getQueryInterface();
 
+		tableNames.forEach(tableName=>{
+			dbInterface.describeTable(tableName).then(console.log);
+		})
+
 		const tmp_talbes = Object.keys(tables).filter(name => !tableNames.includes(name));
 		for (const table of tmp_talbes){ 
 			dbInterface.createTable(table, tables[table]).then(() =>{
@@ -177,8 +181,8 @@ class BasicClient
 		
     }
 
-	getUser(id){
-		return this.Query.SELECT(`SELECT * FROM "User" WHERE "id" = ? LIMIT 1`, id).then(([user])=> user);
+	async getUser(id){
+		return await this.Query.SELECT(`SELECT * FROM "User" WHERE "id" = ? LIMIT 1`, id).then(([user])=> user);
 	}
 
 	/**

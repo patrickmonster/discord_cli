@@ -11,6 +11,7 @@ import {
     , MessageActionRow
     , MessageButtonOptions
     , MessageEmbed
+    , User
 } from  'discord.js';
 
 declare module 'discord.js';
@@ -113,14 +114,22 @@ class BaseClient extends Client {
     public defer(interaction: Interaction, target: (...args: any[]) => Awaitable<void>): void;
 }
 
+function Query(type: string, query: string, ...replacements: Object[]): Promise<any>;
+interface QueryObject{
+    Select : Query;
+    UPDATE : Query;
+    INSERT : Query;
+    DELETE : Query;
+}
+
 class DBClient extends BaseClient {
     public constructor(options: BasicDBClientOptions);
 
-    public sql(type : QueryTypes, query: string, ...replacements: Object[]): Promise<any>;
-    public Select(query: string, ...replacements: Object[]): Promise<any>;
-    public Update(query: string, ...replacements: Object[]): Promise<any>;
-    public Insert(query: string, ...replacements: Object[]): Promise<any>;
-    public Delete(query: string, ...replacements: Object[]): Promise<any>;
+    public Query : Query;
+    public Query : QueryObject;
+
+    public set User(user: User);
+    public getUser(id : string): any;
 }
 
 export type Client = BaseClient;
