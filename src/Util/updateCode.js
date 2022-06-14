@@ -23,7 +23,7 @@ const loadFile = (dir, libs) => {
 		const cmd = require(dir);
 		console.log(`[파일관리자]${libs[name] ? '갱신' : '신규'} - ${dir}`);
 		// 캐시가 없는 경우에만 or 개발 모드일 경우 동작
-		if (cli.mode == "development" && !libs[name]) nocache(dir, (d) => loadFile(d, libs));
+		if (cli?.mode == "development" && !libs[name]) nocache(dir, (d) => loadFile(d, libs));
 		libs[name] = cmd;
 	}
 	catch (e) {
@@ -46,7 +46,7 @@ module.exports = function getCommands(target) {
 	const get = (name) => libs[name] || libs[Object.keys(libs).find(k => (libs[k].name && libs[k].name == name) || (libs[k].aliases && libs[k].aliases.includes(name)))];
 	return {
 		...libs,
-		options: Object.values(libs),
+		options : Object.values(libs),
 		get,
 		add: (name) => loadFile(path.join(target, name)),
 		execute: function(interaction, commandName, ...args) {
@@ -70,6 +70,7 @@ module.exports = function getCommands(target) {
 				description : cmd.description,
 				help : cmd.help,
 			}
-		),
+		),// [...this.command.values()].map((cmd) => getAppCommand(cmd));
+		getCommands : () => Object.values(libs),
 	};
 };

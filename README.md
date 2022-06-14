@@ -64,3 +64,26 @@ discord 메세지를 간편하게 빌드 가능한 툴
   명령 라우팅(하위 명령 관리용)
 ```
 
+앱/ 슬레시 커맨드를 간편하게 관리
+```
+? 어떤 작업을 하실건가요? 명령어 등록
+
+=================================================================
+Disocrd - Commands update tool
+
+명령을 간편하게 업데이트 하는 기능입니다.
+해당 기능은, 모든 글로벌 명령을 업데이트 하기에
+기존의 명령 설정이 변경 될 수 있습니다.
+
+@patrickmonster/discord_cli 의 LoadCommands내부 기능을 통하여
+명령을 불러옵니다.
+
+해당 형식은, discord 공식 문서
+[ https://discord.com/developers/docs/interactions/application-commands#application-command-object ]
+를 따르고 있으며, discord.js 명령 업데이트 형식과 무관 합니다.
+=================================================================
+
+? 명령어가 있는 폴더를 선택 해 주세요(앱/슬레시커맨드) : AppCommand, Command
+? 봇 토큰을 입력 해 주세요! [hidden]
+```
+

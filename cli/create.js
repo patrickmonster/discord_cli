@@ -18,11 +18,7 @@ inquirer.prompt({
         if (/^([A-Za-z\-\\_\d])+$/.test(input)) return true;
         else return 'Project name may only include letters, numbers, underscores and hashes.';
     },
-}, {
-    name: 'project-token',
-    type: 'input',
-    message: '봇 토큰을 입력 해 주세요!',
-}, ).then(({
+}).then(({
     'project-name': name
 }) => {
     console.log("프로젝트를 복제하는중...", name);

@@ -5,9 +5,11 @@ const Client = require('../src/Client');
 // const client = new Client({
 
 // });
-const dashboard = new Dashbord(null, {
+Dashbord(null, {
 
+}).then(dashboard => {
+
+    dashboard.run(()=>{
+        console.log("running dashboard");
+    })
 });
-dashboard.listen(3200, ()=>{
-    console.log("start server 3200p");
-})
