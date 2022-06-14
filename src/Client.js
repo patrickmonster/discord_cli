@@ -19,6 +19,7 @@ class BasicClient extends Client{
         clientOptions = clientOptions || {};
         updateCode( path.join(__dirname, 'base')).forEach((value, key)=>_this[key] = value);
         
+        console.log(_this.logger);
         const baseDir = path.join(process.cwd(), clientOptions.eventDir || "event");
         if(fs.existsSync(baseDir))
             updateCode( baseDir ).forEach((func, event)=> _this.on(event, func) );

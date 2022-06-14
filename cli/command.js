@@ -42,7 +42,7 @@ inquirer
         choices: commandFolders
     }, {
         name: 'token',
-        type: 'password',
+        type: 'input',
         message: '봇 토큰을 입력 해 주세요!',
     }])
     .then(({commands, token}) => {

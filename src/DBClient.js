@@ -100,17 +100,18 @@ function init(db){
 }
 
 class BasicClient 
-	// extends Client
+	extends Client
 {
 
     constructor(clientOptions){
-        // super(clientOptions);
+        super(clientOptions);
 		const _this = this;
 
         const dbFile = path.resolve(process.cwd(),clientOptions.dbDir || "djsCli.db");
         const db = new Sequelize({
             dialect: 'sqlite',
-            storage: dbFile
+            storage: dbFile,
+			logging: false
         });
 		
         db.sql = function(type, query, ...replacements){
@@ -121,7 +122,7 @@ class BasicClient
 				replacements, logging : _this.logger.info
 			}).then(out => {
 				if(clientOptions.isDBQuery)
-					db.sql("INSERT", `INSERT INTO ServerLog (owner, msg, "type") VALUES ("SQL_LOG", ?, '02')`, `${Date.now().getTime() - startTime.getTime()}ms ${query} ${JSON.stringify(replacements)}`).catch(_this.logger.error);
+					insertLog('02','SQL_LOG',`${Date.now().getTime() - startTime.getTime()}ms ${query} ${JSON.stringify(replacements)}`)
 				return out;
 			});
         };
@@ -129,7 +130,14 @@ class BasicClient
 		this._db = db;
 
         init(db);
+		/////////////////////////////////////////////////////////////////////////////////////////////
 
+		function insertLog(type, owner, msg) {
+			db.sql("INSERT", 
+				`INSERT INTO ServerLog (owner, msg, "type") VALUES (?, ?, ?)`, 
+				owner, msg, type
+			).catch(_this.logger.error);
+		}
 
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -155,32 +163,19 @@ class BasicClient
 		this.on("channelUpdate", (oldChannel, newChannel) =>updateChannelQuery(newChannel));
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		this.once("ready", _ =>{
-			db.sql("UPSERT",
-				`INSERT OR REPLACE INTO ServerLog (owner, msg, "type") VALUES ("SERVER_LOG", ?, '00')`, 
-				`Starting discord service.... ${new Date()}\nLogged in as ${client.user.tag}!`
-			).catch(_this.logger.error);
+			insertLog('00','SERVER_LOG',`Starting discord service.... ${new Date()}\nLogged in as ${_this.user.tag}!`);
 		});
 
-		this.on('debug', function(info) {
-			db.sql("INSERT",
-				`INSERT INTO ServerLog (owner, msg, "type") VALUES ("SERVER_LOG", ?, '01')`, info.message
-			).catch(_this.logger.error);
+		this.on('error', function(error) { 
+			insertLog('02','ERROR_LOG',`${error.name} ${error.stack}`);
 		});
 
+		if(clientOptions.dbDebugLog) // 디버깅 로그 활성화인 경우에만
+			this.on('debug', function(info) { 
+				insertLog('01','DEBUG_LOG',info);
+			});
 		
     }
-
-
-	/// 임시 환경
-	on(str, callback) {}
-	once(str, callback) {}
-
-	get logger (){
-		return {
-			info: console.log,
-			error: console.error,
-		}
-	}
 
 	getUser(id){
 		return this.Query.SELECT(`SELECT * FROM "User" WHERE "id" = ? LIMIT 1`, id).then(([user])=> user);
