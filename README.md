@@ -2,55 +2,81 @@
 
 디스코드 앱을 조금 더 간편하게 구축 하기 위한 라이브러리
 
-설치
+
+## 설치
 ```
 npm i @patrickmonster/discord_cli -g
 ```
+ 라이브러리 용도로 사용 가능하지만, cli 형태로 설치 및 사용을 권장 드립니다.
 
-CLI 기능 사용
+
+  <br><br><br>
+
+# djs-cli
 ```
 [npx] djs-cli
 ```
-1) 프로젝트 생성
-2) 클라이언트 이벤트 추가  
-    ㄴ 이벤트 생성
-3) 보조 명령 추가
-    ㄴ 앱커맨드 및 슬레시 커맨드 추가
+
+명령어
+ - 프로젝트 생성
+ - 클라이언트 이벤트 추가
+ - 보조 명령 추가
+ - 커맨드 명령어 등록 
+
+
+---
+## 프로젝트 생성
+기본 설정이 이루어진 프로젝트를 생성 합니다.
+(내부적으로 cli 기능이 탑제되어 있습니다.)
+
+프로젝트 생성시 셈플 코드와, npm 필수 패키지를 자동 설치 합니다.
+
+## 보조기능 및 라이브러리
+### discord event 자동 추가
+
+설정된 디렉토리를 통하여 disocrd 이벤트를 별도의 추가 코드 없이
+추가 가능합니다.
+  
+  <br>
+
+### 라이브 코딩 지원
+disocrd 레이트 리밋의 한계로 인하여, 프로그램상의 오류가 발생 하였을때,
+별도의 리 부트 없이 코드가 업데이트 됩니다. (LoadCommands를 통한코드 관리시)
+
+package.json내부에 정의된 "djs-cli"를 통하여 "development"경우에 라이브 코딩을 지원 합니다.
+  
+  <br>
+
+### 컴포넌트 자동정렬 지원
+매뉴 및 버튼 컴포넌트를 자동으로 정렬하여,
+사용자 편의성으로 지원 합니다.
 ```
-? 어떤 작업을 하실건가요? 
- > 프로젝트 생성
-  클라이언트 이벤트 추가
-  보조 명령 추가
-  ──────────────
+// 역할을 가져와, 해당하는 역할만 선택처리 나머지는 선택 해제 처리 합니다.
+function(client, role_id, permission_new, disabled = false) {
+    const bitPermission = BigInt(permission_new);
+    const permisses = Object.keys(PermissionFlagsBits)
+          .filter(k => bitPermission & PermissionFlagsBits[k]);
+    
+    return client.getMenu({
+        customId : `role permissions ${role_id}`
+        , disabled
+        , maxValues : 25 // 항목이 25개가 넘을 경우, 자동 처리됩니다.
+        , minValues : 0
+        , placeholder : `변경하실 역할을 선택 해 주세요!`
+    }, ...Object.keys(PermissionFlagsLagsKR).map(k=> {
+        const ment = PermissionFlagsLagsKR[k]; // 한글 역할 이름 입니다.
+        return {
+            default : permisses.includes( k ),
+            description : k,
+            label : ment,
+            value : k
+        };
+    }))
+}
+
 ```
-
-간편 사용을 목표로 하고 있습니다.
-
-주요기능
-
-빠른 디버깅 및 코딩을 위한 라이브코딩용 라이브러리 제공 
-
-discord 메세지를 간편하게 빌드 가능한 툴
-> getButton(), getMenu(), getEmbed()
-
-내부적인 로그 규칙
-> logger
-
-
-빠른 클라이언트 이벤트 추가 및 주석지원
-```
-? 추가할 이벤트를 선택 해 주세요 : (Press <space> to select, <enter> to submit.)
- >( ) apiRequest
- ( ) apiResponse
- (*) channelCreate
- ( ) channelDelete
- ( ) channelPinsUpdate
- ( ) channelUpdate
- ( ) debug
-(Move up and down to reveal more choices)
-```
-
-커맨드 명령을 손쉽게 관리
+<br><br>
+## 커맨드 명령을 손쉽게 관리
 ```
 ? 어떤 작업을 하실건가요? 보조 명령 추가
 ? 명령이름을 입력 해 주세요 : 역할변경
@@ -63,8 +89,10 @@ discord 메세지를 간편하게 빌드 가능한 툴
   슬레시커맨드 라우팅(하위 명령 관리용)
   명령 라우팅(하위 명령 관리용)
 ```
+cli를 통하여, 사용자가 앱 커맨드를 쉽게 생성 가능하도록 지원 해 드립니다.
 
-앱/ 슬레시 커맨드를 간편하게 관리
+<br><br>
+## 앱/ 슬레시 커맨드를 간편하게 관리
 ```
 ? 어떤 작업을 하실건가요? 명령어 등록
 
@@ -86,4 +114,15 @@ Disocrd - Commands update tool
 ? 명령어가 있는 폴더를 선택 해 주세요(앱/슬레시커맨드) : AppCommand, Command
 ? 봇 토큰을 입력 해 주세요! [hidden]
 ```
+<br><br>
 
+---
+### 변경기록
+
+1.1.1
+> cli 가이드 문서 [README.md]문서 개편
+> 
+
+
+1.1.0
+> 슬레시 커맨드 및 앱 커맨드를 등록 및 관리 cli 작성

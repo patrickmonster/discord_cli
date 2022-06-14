@@ -18,7 +18,7 @@ inquirer.prompt({
     "프로젝트 생성",
     "클라이언트 이벤트 추가",
     "보조 명령 추가",
-    "명령어 등록",
+    "커맨드 명령어 등록 ",
     // "데이터베이스 설정",
     new inquirer.Separator(),
   ].map((name, value) => typeof name == "string" ? { name, value } : name),

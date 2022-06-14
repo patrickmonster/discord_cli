@@ -25,7 +25,7 @@ const name = path.basename(__filename,".js");
             interaction.reply({
                 content : "해당 맴버가 소유하고 있는 역할들 입니다.",
                 components : client.getMenu({
-                    customId : `${process.env.discriminator}role permissions ${role_id}`
+                    customId : `role permissions ${role_id}`
                     , disabled
                     , maxValues : 25
                     , minValues : 0
