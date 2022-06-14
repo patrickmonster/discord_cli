@@ -13,8 +13,12 @@ import {
     , MessageEmbed
 } from  'discord.js';
 
-declare module "discord.js";
-declare module "discord-modals";
+declare module 'discord.js';
+declare module 'discord-modals';
+
+import {
+    QueryTypes
+} from 'sequelize'
 //////////////////////////////////////////////////////
 
 export const enum MessageButtonStyles {
@@ -41,6 +45,10 @@ interface GetCommand {
 //////////////////////////////////////////////////////
 export interface BasicClientOptions extends ClientOptions {
     eventDir? : string;
+}
+
+export interface BasicDBClientOptions extends ClientOptions {
+    dbDir? : string;
 }
 
 export interface AutoShardingOptions {
@@ -92,7 +100,7 @@ export function LoadSubCommands(target: string): GetCommand;
 
 //////////////////////////////////////////////////////
 
-export class Client extends Client {
+class BaseClient extends Client {
     public constructor(options: BasicClientOptions);
     getTotalGuild() : BasicTotalGuild; // 길드 인원수를 가져옴
     
@@ -104,6 +112,20 @@ export class Client extends Client {
     public getEmbed(): MessageEmbed;
     public defer(interaction: Interaction, target: (...args: any[]) => Awaitable<void>): void;
 }
+
+class DBClient extends BaseClient {
+    public constructor(options: BasicDBClientOptions);
+
+    public sql(type : QueryTypes, query: string, ...replacements: Object[]): Promise<any>;
+    public Select(query: string, ...replacements: Object[]): Promise<any>;
+    public Update(query: string, ...replacements: Object[]): Promise<any>;
+    public Insert(query: string, ...replacements: Object[]): Promise<any>;
+    public Delete(query: string, ...replacements: Object[]): Promise<any>;
+}
+
+export type Client = BaseClient;
+export type DBClient = DBClient;
+
 
 export interface AutoSharding extends ShardingManager {
     public constructor(options: ShardingManagerOptions);

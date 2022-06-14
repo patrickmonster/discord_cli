@@ -1,4 +1,9 @@
 # discord_cli
+<p align="center"><a href="https://nodei.co/npm/@patrickmonster/discord_cli"><img src="https://nodei.co/npm/@patrickmonster/discord_cli.png.png"></a></p>
+<p align="center">
+  <img src="https://img.shields.io/npm/v/@patrickmonster/discord_cli">
+  <img src="https://img.shields.io/npm/l/@patrickmonster/discord_cli">
+</p>
 
 디스코드 앱을 조금 더 간편하게 구축 하기 위한 라이브러리
 
