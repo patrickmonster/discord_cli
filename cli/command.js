@@ -54,9 +54,9 @@ inquirer
         // 파일 옵션을 불러옴
         const commandsOptions = commands.map(file => updateCode(path.join(process.cwd(), file)).getCommands()).flat();
 
-        fetch( DISCORD_USER, { method: "GET", headers: JSON.stringify(headers)}).then(({body: { id, username, discriminator }})=>{
+        fetch( `https://discord.com/api${DISCORD_USER("@me")}`, { method: "GET", headers: JSON.stringify(headers)}).then(({body: { id, username, discriminator }})=>{
 	        console.log(`${username}#${discriminator}](${id}) 명령어 업데이트 - V.${package_option.version}`);
-            return fetch( DISCORD_COMMANDS, { method: "GET", headers: JSON.stringify(headers), body : commandsOptions.flat()});
+            return fetch( `https://discord.com/api${DISCORD_COMMANDS(id)}`, { method: "GET", headers: JSON.stringify(headers), body : commandsOptions.flat()});
         }).then(({body}) =>{
             console.log(`${body.length}항목 명령어 업데이트 - 성공`);
             process.exit();
