@@ -8,18 +8,18 @@ const client = new DBClient({
     intents : [ Intents.FLAGS.DIRECT_MESSAGES ]
 });
 
-client.on("ready", function(){
-    // insert user data
-    client.User = {
-        accentColor : 333333
-        , id : "00000000"
-        , tag : "1111"
-        , username : "test"
-        , avatar : ""
-        , banner : ""
-    }
+client.on("ready", ready);
 
-    client.getUser("00000000").then(user=>{
-        console.log(user);
-    })
-});
+function ready(){
+    // insert user data
+    // client.User = { 
+
+    // client.getUser("00000000").then(user=>{
+    //     console.log(user);
+    // })
+
+    // client.Table.createTable("test", table);
+    // client.Table.removeColumn("User", "test")//.then(_=>)
+}
+
+setTimeout(ready, 1000);

@@ -3,6 +3,9 @@ const Client = require('./Client')
 
 const fs = require('fs');
 const path = require("path");
+
+// const updateCode = require("./Util/updateCode");
+
 const { Sequelize, DataTypes, QueryTypes } = require('sequelize');
 // Sequelize.DATA
 /* ============================================================================================ */
@@ -78,6 +81,11 @@ const tables = {
 		,username : DataTypes.CHAR(100)
 		,avatar : DataTypes.CHAR(100)
 		,banner : DataTypes.CHAR(100)
+		,type : {
+			type : DataTypes.CHAR(1),// 사용자정보 - 관리 혹은 지정 상태
+			defaultValue : 'U',
+			allowNull : false
+		}
 		,createdAt :{
 			type : DataTypes.DATE,
 			defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
@@ -89,10 +97,6 @@ const tables = {
 function init(db){
     db.sql("SHOWTABLES", "SELECT * FROM sqlite_master WHERE type='table';").then(tableNames=>{
 		const dbInterface = db.getQueryInterface();
-
-		tableNames.forEach(tableName=>{
-			dbInterface.describeTable(tableName).then(console.log);
-		})
 
 		const tmp_talbes = Object.keys(tables).filter(name => !tableNames.includes(name));
 		for (const table of tmp_talbes){ 
@@ -134,37 +138,23 @@ class BasicClient
 		this._db = db;
 
         init(db);
-		/////////////////////////////////////////////////////////////////////////////////////////////
 
-		function insertLog(type, owner, msg) {
-			db.sql("INSERT", 
-				`INSERT INTO ServerLog (owner, msg, "type") VALUES (?, ?, ?)`, 
-				owner, msg, type
-			).catch(_this.logger.error);
-		}
+		// updateCode( path.join(__dirname, 'DBBase'))
+		// 	.forEach((value, key)=>
+		// 		_this[key] = (...args)=>
+		// 			value.call(_client, ...args)
+		// 	);
 
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		
-		function updateGuildQuery({id, name, ownerId}){
-			db.sql("UPSERT", 
-				"INSERT OR REPLACE INTO Guild (id, name, ownerId, isDeleted) VALUES (?, ?, ?, ?)", 
-				id, name, ownerId, 'N'
-			).catch(_this.logger.error);
-		}
-		this.on("guildCreate", updateGuildQuery);
-		this.on("guildDelete", updateGuildQuery);
+		this.on("guildCreate", _this.updateGuildQuery);
+		this.on("guildDelete", _this.updateGuildQuery);
 
 		/////////////////////////////////////////////////////////////////////////////////////////////
 
-		function updateChannelQuery({id, name, type, guildId :  guild_id, parentId}){
-			db.sql("UPSERT", 
-				`INSERT OR REPLACE INTO Channel (id, name, "type", isDeleted, guild_id, parentId, editAt) VALUES (?, ?, ?, 'N',?, ?, CURRENT_TIMESTAMP)`, 
-				id, name, type, guild_id, parentId
-			).catch(_this.logger.error);
-		}
-		this.on("channelCreate",updateChannelQuery);
-		this.on("channelDelete", updateChannelQuery);
-		this.on("channelUpdate", (oldChannel, newChannel) =>updateChannelQuery(newChannel));
+		this.on("channelCreate",_this.updateChannelQuery);
+		this.on("channelDelete", _this.updateChannelQuery);
+		this.on("channelUpdate", (oldChannel, newChannel) =>_this.updateChannelQuery(newChannel));
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		this.once("ready", _ =>{
 			insertLog('00','SERVER_LOG',`Starting discord service.... ${new Date()}\nLogged in as ${_this.user.tag}!`);
@@ -180,9 +170,34 @@ class BasicClient
 			});
 		
     }
+	/*
+	get logger (){
+		return {
+			error : console.error
+		}
+	}
+	on(){}
+	once(){} */
 
-	async getUser(id){
-		return await this.Query.SELECT(`SELECT * FROM "User" WHERE "id" = ? LIMIT 1`, id).then(([user])=> user);
+	updateGuildQuery({id, name, ownerId}){
+		this._db.sql("UPSERT", 
+			"INSERT OR REPLACE INTO Guild (id, name, ownerId, isDeleted) VALUES (?, ?, ?, ?)", 
+			id, name, ownerId, 'N'
+		).catch(_this.logger.error);
+	}
+	updateChannelQuery({id, name, type, guildId :  guild_id, parentId}){
+		this._db.sql("UPSERT", 
+			`INSERT OR REPLACE INTO Channel (id, name, "type", isDeleted, guild_id, parentId, editAt) VALUES (?, ?, ?, 'N',?, ?, CURRENT_TIMESTAMP)`, 
+			id, name, type, guild_id, parentId
+		).catch(_this.logger.error);
+	}
+
+	// 서버 로그에 추가
+	insertLog(type, owner, msg) {
+		this._db.sql("INSERT", 
+			`INSERT INTO ServerLog (owner, msg, "type") VALUES (?, ?, ?)`, 
+			owner, msg, type
+		).catch(this.logger.error);
 	}
 
 	/**
@@ -194,7 +209,11 @@ class BasicClient
 		this.Query("UPSERT",
 			`INSERT OR REPLACE INTO "User" (id, accentColor, tag, username, avatar, banner, bot) VALUES(?, ?, ?, ?, ?, ?, ?);`,
 			id, accentColor, tag, username, avatar, banner, bot ? 'Y' : 'N'
-		).catch(this.error);
+		).catch(this.logger.error);
+	}
+	
+	async getUser(id){
+		return await this.Query.SELECT(`SELECT * FROM "User" WHERE "id" = ? LIMIT 1`, id).then(([user])=> user);
 	}
 
     get Query(){
@@ -207,16 +226,36 @@ class BasicClient
     }
 
 	get Table(){
-		const {
-			createTable, dropTable, renameTable, tableExists,
-			addColumn, removeColumn, changeColumn, renameColumn,
-			addIndex, removeIndex
-		} = this._db.getQueryInterface();
-		return {
-			createTable, dropTable, renameTable, tableExists,
-			addColumn, removeColumn, changeColumn, renameColumn,
-			addIndex, removeIndex	
+		const dbInterface = this._db.getQueryInterface();
+		const { addColumn, changeColumn } = dbInterface;
+
+		const column = (type, length = 10) =>{
+			// DataTypes.CHAR / DataTypes.DATE / DataTypes.TEXT / DataTypes.INTEGER
+			let DBtype = DataTypes[type.toUpperCase()];
+			if (typeof DBtype === "function")
+				DBtype = DBtype(length);
+			return DBtype;
+		}
+
+		const out = {
+			addColumn : (table, key, type, options = {}) => {
+				return addColumn.call(dbInterface, table, key, {
+					...options,
+					type : column(type, options.typeSize),
+				});
+			},changeColumn : (table, key, type, options = {}) => {
+				return changeColumn.call(dbInterface, table, key, {
+					...options,
+					type : column(type, options.typeSize),
+				});
+			},getColumns : (table) => dbInterface.describeTable(table),
 		};
+		for (const name of ["createTable","dropTable","renameTable","tableExists","describeTable","removeColumn","renameColumn","addIndex","removeIndex"]){
+			out[name] = (...args)=> 
+				dbInterface[name].call(dbInterface, ...args);
+		}
+
+		return out;
 	}
 
 }
