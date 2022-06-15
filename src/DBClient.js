@@ -36,6 +36,16 @@ const tables = {
 			allowNull : false
 		}
 	},
+	Cache : {
+		key : {
+			type : DataTypes.CHAR(100),
+			primaryKey : true,
+			allowNull : false
+		},
+		value : {
+			type : DataTypes.TEXT
+		},
+	},
 	Guild : {
 		id : {
 			type : DataTypes.CHAR(20),
@@ -98,7 +108,7 @@ function init(db){
     db.sql("SHOWTABLES", "SELECT * FROM sqlite_master WHERE type='table';").then(tableNames=>{
 		const dbInterface = db.getQueryInterface();
 
-		const tmp_talbes = Object.keys(tables).filter(name => !tableNames.includes(name));
+ 		const tmp_talbes = Object.keys(tables).filter(name => !tableNames.includes(name));
 		for (const table of tmp_talbes){ 
 			dbInterface.createTable(table, tables[table]).then(() =>{
 				console.log("테이블 생성 -", table);
@@ -214,6 +224,12 @@ class BasicClient
 	
 	async getUser(id){
 		return await this.Query.SELECT(`SELECT * FROM "User" WHERE "id" = ? LIMIT 1`, id).then(([user])=> user);
+	}
+
+	set Data({
+		key, value
+	}){
+
 	}
 
     get Query(){
