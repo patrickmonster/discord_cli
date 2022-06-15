@@ -11,7 +11,7 @@ const package_option = require("../package.json");
 
 ////////////////////////////////////////////////////////////////////////////
 const DISCORD_USER = (id) => `/users/${id}`;
-const DISCORD_COMMANDS = (appid) => `/applications/${appid}/commands}`;
+const DISCORD_COMMANDS = (appid) => `/applications/${appid}/commands`;
 /////////////////////////////////////////////////////////////////a///////////
 inquirer.registerPrompt('search-checkbox', require('inquirer-search-checkbox'));
 
@@ -42,7 +42,7 @@ inquirer
         choices: commandFolders
     }, {
         name: 'token',
-        type: 'password',
+        type: 'input',
         message: '봇 토큰을 입력 해 주세요!',
     }])
     .then(({commands, token}) => {
@@ -51,14 +51,19 @@ inquirer
             "Content-Type": "application/json",
         };
 
+        console.log(headers);
         // 파일 옵션을 불러옴
         const commandsOptions = commands.map(file => updateCode(path.join(process.cwd(), file)).getCommands()).flat();
 
-        fetch( DISCORD_USER, { method: "GET", headers: JSON.stringify(headers)}).then(({body: { id, username, discriminator }})=>{
+        fetch( `https://discord.com/api${DISCORD_USER("@me")}`, { method: "GET", headers })
+            .then(data => data.json())
+            .then(({ id, username, discriminator })=>{
 	        console.log(`${username}#${discriminator}](${id}) 명령어 업데이트 - V.${package_option.version}`);
-            return fetch( DISCORD_COMMANDS, { method: "GET", headers: JSON.stringify(headers), body : commandsOptions.flat()});
-        }).then(({body}) =>{
-            console.log(`${body.length}항목 명령어 업데이트 - 성공`);
+            return fetch( `https://discord.com/api${DISCORD_COMMANDS(id)}`, { method: "PUT", headers: headers, body : 
+                JSON.stringify(commandsOptions.flat())
+            });
+        }).then(data => data.json()).then((data) =>{
+            console.log(data, `항목 명령어 업데이트 - 성공`);
             process.exit();
         }).catch(err =>{
             console.error(`네트워크문제 혹은 토큰이 올바르지 않거나, 문서가 형식에 맞지 않습니다!`);

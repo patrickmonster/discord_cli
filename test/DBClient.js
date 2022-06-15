@@ -1,11 +1,14 @@
+const { BasicClient, Intents } = require("../index");
+
 const DBClient = require('../src/DBClient');
 
 
 
-const client = new DBClient({});
+const client = new DBClient({
+    intents : [ Intents.FLAGS.DIRECT_MESSAGES ]
+});
 
-setTimeout(()=>{
-
+client.on("ready", function(){
     // insert user data
     client.User = {
         accentColor : 333333
@@ -19,4 +22,4 @@ setTimeout(()=>{
     client.getUser("00000000").then(user=>{
         console.log(user);
     })
-}, 1000 )
+});

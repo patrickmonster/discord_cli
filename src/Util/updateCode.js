@@ -61,7 +61,9 @@ module.exports = function getCommands(target) {
 		},
 		forEach: (callback) => {
 			const keys = Object.keys(libs);
-			keys.forEach(k => callback(libs[k], k, libs));
+			for(const k of keys) {
+				callback(libs[k], k, libs)
+			}
 			return keys;
 		},
 		getHelp : () => [...this.command.values()].map(
