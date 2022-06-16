@@ -1,12 +1,11 @@
 # discord_cli
+디스코드 앱을 조금 더 간편하게 구축 하기 위한 라이브러리
+
 <p align="center"><a href="https://nodei.co/npm/@patrickmonster/discord_cli"><img src="https://nodei.co/npm/@patrickmonster/discord_cli.png.png"></a></p>
 <p align="center">
   <img src="https://img.shields.io/npm/v/@patrickmonster/discord_cli">
   <img src="https://img.shields.io/npm/l/@patrickmonster/discord_cli">
 </p>
-
-디스코드 앱을 조금 더 간편하게 구축 하기 위한 라이브러리
-
 
 ## 설치
 ```
@@ -123,6 +122,9 @@ Disocrd - Commands update tool
 
 ---
 ### 변경기록
+
+1.1.5
+> 이벤트 생성시, 폴더를 선택 가능하도록 변경
 
 1.1.4
 > 슬레시/앱커맨드 등록시, 진행중 발생하는 문제를 해결 하였습니다.
