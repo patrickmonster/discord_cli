@@ -4,6 +4,8 @@ const fs = require("fs");
 const path = require("path");
 
 inquirer.registerPrompt('search-checkbox', require('inquirer-search-checkbox'));
+
+const folders = fs.readdirSync(process.cwd()).filter(file => !(file[0] == ".") && fs.lstatSync(file).isDirectory());
 // params, typeObject, discord_js
 const options = {
     request : "{ method, path: string, route: string, options: Object, retries: number }",
@@ -142,8 +144,6 @@ const eventList = {
     "voiceStateUpdate": [" oldState, newState"],
     "warn": [" info"],
     "webhookUpdate": [" channel"],
-
-    // "modalSubmit" : [" modal"],
 };
 
 function getType(type){
@@ -156,30 +156,36 @@ function getType(type){
 
 const baseDir = path.join(process.cwd(), "event");
 !fs.existsSync(baseDir) && fs.mkdirSync(baseDir);
-const commandFolders = fs.readdirSync(baseDir)
-    .filter(file => file.endsWith('.js'));
-inquirer
-    .prompt({
-        name: "events",
-        message: "추가할 이벤트를 선택 해 주세요 :",
-        type: "search-checkbox",
-        choices: Object
-            .keys(eventList)
-            .filter(name => !commandFolders.includes(`${name}.js`))
-    })
-    .then(({events}) => {
-        for (const event of events) {
-            const [params, otherSorce] = eventList[event];
-            const discord_js = new Set();
-            const param_data = params.split(",").map( param => {
-                if(param== "")return "";
-                const type = getType(param.trim());
-                if(!type.includes("<") && !type.includes("{") && type !="*" && !["string", "number"].includes(type)) discord_js.add(type);
-                return ` * @param { ${type} } ${param} `;
-            }).join("\n");
 
-            fs.writeFileSync(
-                path.join(process.cwd(), "event", `${event}.js`),`'use strict';
+inquirer.prompt({
+    name: "target",
+    message: "이벤트가 있는 폴더를 선택 해 주세요 :",
+    type: "list",
+    choices: folders
+}).then(({target})=>{
+    const commandFolders = fs.readdirSync(target).filter(file => file.endsWith('.js'));
+    return inquirer
+        .prompt({
+            name: "events",
+            message: "추가할 이벤트를 선택 해 주세요 :",
+            type: "search-checkbox",
+            choices: Object
+                .keys(eventList)
+                .filter(name => !commandFolders.includes(`${name}.js`))
+        })
+}).then(({events}) => {
+    for (const event of events) {
+        const [params, otherSorce] = eventList[event];
+        const discord_js = new Set();
+        const param_data = params.split(",").map( param => {
+            if(param== "")return "";
+            const type = getType(param.trim());
+            if(!type.includes("<") && !type.includes("{") && type !="*" && !["string", "number"].includes(type)) discord_js.add(type);
+            return ` * @param { ${type} } ${param} `;
+        }).join("\n");
+
+        fs.writeFileSync(
+            path.join(process.cwd(), "event", `${event}.js`),`'use strict';
 ${discord_js.size ? `const { ${Array.from(discord_js).join(", ")} } = require('discord.js')` : ""} // 추가 라이브러리
 /**
 * ${event}.js - 클라이언트 이벤트
@@ -188,7 +194,7 @@ ${param_data}
 * @returns 
 */
 module.exports = function ${event}(${params} ) {
-    ${otherSorce || ""}
+${otherSorce || ""}
 }`);
-        }
-    });
+    }
+});
