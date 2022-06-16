@@ -154,8 +154,8 @@ function getType(type){
     return options[mType] || "*";
 }
 
-const baseDir = path.join(process.cwd(), "event");
-!fs.existsSync(baseDir) && fs.mkdirSync(baseDir);
+// const baseDir = path.join(process.cwd(), "event");
+// !fs.existsSync(baseDir) && fs.mkdirSync(baseDir);
 
 inquirer.prompt({
     name: "target",
