@@ -54,16 +54,22 @@ inquirer
         console.log(headers);
         // 파일 옵션을 불러옴
         const commandsOptions = commands.map(file => updateCode(path.join(process.cwd(), file)).getCommands()).flat();
+        let cmt;
 
         fetch( `https://discord.com/api${DISCORD_USER("@me")}`, { method: "GET", headers })
             .then(data => data.json())
             .then(({ id, username, discriminator })=>{
-	        console.log(`${username}#${discriminator}](${id}) 명령어 업데이트 - V.${package_option.version}`);
+                cmt = `${username}#${discriminator}](${id}) 명령어 업데이트 - V.${package_option.version}`;
+	        console.log(cmt);
             return fetch( `https://discord.com/api${DISCORD_COMMANDS(id)}`, { method: "PUT", headers: headers, body : 
-                JSON.stringify(commandsOptions.flat())
+                JSON.stringify(commandsOptions.flat(),  (key, value) =>
+                    typeof value === 'bigint'
+                        ? value.toString()
+                        : value // return everything else unchanged
+                )
             });
         }).then(data => data.json()).then((data) =>{
-            console.log(data, `항목 명령어 업데이트 - 성공`);
+            console.log(data, cmt );
             process.exit();
         }).catch(err =>{
             console.error(`네트워크문제 혹은 토큰이 올바르지 않거나, 문서가 형식에 맞지 않습니다!`);

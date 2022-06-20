@@ -37,7 +37,7 @@ const loadFile = (dir, libs) => {
  * 커맨드 관리 모델
  * @param {*} target 탐색위치
  */
-module.exports = function getCommands(target) {
+ module.exports = function getCommands(target) {
 	const libs = {};
 	const commandFolders = fs.readdirSync(target).filter(file => file.endsWith('.js'));
 	console.log(`[파일관리자] 지정경로 - ${target}`);
@@ -73,10 +73,18 @@ module.exports = function getCommands(target) {
 				help : cmd.help,
 			}
 		),
-		getCommands : () => Object.values(libs).map( o => ({ // 기본 권한이 없을경우 모든 권한으로 설정
-			default_member_permissions : 1n << 10n, // ViewChannel
-			dm_permission : false, // dmChannel
-			...o,
-		})),
+		getCommands : () => Object.values(libs) // 명령필터
+			.map( cmd =>{
+				const out = {};
+				for (const optionName of commandOptionNames)
+					if(optionName in cmd)
+						out[optionName] = cmd[optionName];
+				
+				return out;
+			}).map( o => ({ // 기본 권한이 없을경우 모든 권한으로 설정
+				default_member_permissions : 1n << 10n, // ViewChannel
+				dm_permission : false, // dmChannel
+				...o,
+			})),
 	};
 };
