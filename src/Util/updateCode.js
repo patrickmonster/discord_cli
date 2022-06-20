@@ -72,7 +72,11 @@ module.exports = function getCommands(target) {
 				description : cmd.description,
 				help : cmd.help,
 			}
-		),// [...this.command.values()].map((cmd) => getAppCommand(cmd));
-		getCommands : () => Object.values(libs),
+		),
+		getCommands : () => Object.values(libs).map( o => ({ // 기본 권한이 없을경우 모든 권한으로 설정
+			default_member_permissions : 1n << 10n, // ViewChannel
+			dm_permission : false, // dmChannel
+			...o,
+		})),
 	};
 };
