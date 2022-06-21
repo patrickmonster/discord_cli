@@ -149,7 +149,7 @@ const eventList = {
 function getType(type){
     let mType = type.replace(/^(old|new)/gi, "");
     if(!mType.length)return ""
-    console.log("타입 캐스팅]", type, mType);
+    console.log("이벤트 생성]", type, mType);
     mType = mType[0].toLowerCase() + mType.slice(1);
     return options[mType] || "*";
 }
@@ -197,4 +197,6 @@ module.exports = function ${event}(${params} ) {
 ${otherSorce || ""}
 }`);
     }
+
+    process.exit();
 });

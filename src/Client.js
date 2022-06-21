@@ -19,14 +19,17 @@ class BasicClient extends Client{
         clientOptions = clientOptions || {};
         updateCode( path.join(__dirname, 'base')).forEach((value, key)=>_this[key] = value);
         
-        console.log(_this.logger);
         const baseDir = path.join(process.cwd(), clientOptions.eventDir || "event");
         if(fs.existsSync(baseDir))
-            updateCode( baseDir ).forEach((func, event)=> _this.on(event, func) );
+            updateCode( baseDir ).forEach((func, event)=> {
+                console.log("클라이언트 이벤트 매니저(등록) :", event);
+                _this.on(event, func)
+            });
         else {
             fs.mkdirSync(baseDir);
-            _this.logger.error("이벤트 폴더를 찾을 수 없습니다!", baseDir);
+            console.error("이벤트 폴더를 찾을 수 없습니다!", baseDir);
             require('../cli/event');
+            console.error("설정이 완료되면, 프로그램을 다시 시작해 주세요.");
         }
     }
 

@@ -1,9 +1,9 @@
-const { BasicClient, Intents } = require("../index");
+const { Client, Intents } = require("../index");
 
-const client = new BasicClient({
+const client = new Client({
     intents : [ Intents.FLAGS.DIRECT_MESSAGES ]
 });
 
 client.on("ready", ()=>{
     client.logger(`${client.user.tag}`);
-}).login("").catch(client.logger);
+}).login(process.env.DISCORD_TOKEN).catch(client.logger);
