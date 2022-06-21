@@ -40,7 +40,7 @@ let log = true;
  * 커맨드 관리 모델
  * @param {*} target 탐색위치
  */
- module.exports = function getCommands(target, isLog = false) {
+ module.exports = function getCommands(target, isLog = true) {
 	const libs = {};
 	const commandFolders = fs.readdirSync(target).filter(file => file.endsWith('.js'));
 	log = isLog; // 로그 기록 여부

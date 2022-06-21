@@ -17,11 +17,11 @@ class BasicClient extends Client{
         const _this = this;
 
         clientOptions = clientOptions || {};
-        updateCode( path.join(__dirname, 'base')).forEach((value, key)=>_this[key] = value);
+        updateCode( path.join(__dirname, 'base'), false).forEach((value, key)=>_this[key] = value);
         
-        const baseDir = path.join(process.cwd(), clientOptions.eventDir || "event");
+        const baseDir = path.join(process.cwd(), clientOptions.eventDir || "Event");
         if(fs.existsSync(baseDir))
-            updateCode( baseDir ).forEach((func, event)=> {
+            updateCode( baseDir, false ).forEach((func, event)=> {
                 console.log("클라이언트 이벤트 매니저(등록) :", event);
                 _this.on(event, func)
             });
