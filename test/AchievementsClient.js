@@ -23,23 +23,21 @@ function ready(){
 
     // client.Table.createTable("test", table);
     // client.Table.removeColumn("User", "test")//.then(_=>)
-    // client.achievement = {
-    //     id : 1,
-    //     name : "첫번째 업적"
-    //     , description : "테스트 업적"
-    //     , type : "TEST"
-    //     , EventType : "CreatedMember"
-    //     , EventCount : 1
-    //     , isDeleted : 'Y'
-    // }
+    client.achievement = {
+        name : "일단 넣어 업적"
+        , description : "테스트 업적"
+        , type : "TEST"
+        , EventType : "CreatedMember"
+    }
 
-    client.achievementComplete({id : "00000000000000000000"}, 2);
+    // client.achievementComplete({id : "00000000000000000000"}, 2);
 
     setTimeout(function(){
         // client.achievement.then(achievement => {
         //     console.log("조회",achievement);
         // })
-        client.getAchievement("00000000000000000000").then(console.log);
+        // client.getAchievement({id : "00000000000000000000"}).then(console.log);
+        client.getReaderBord({id : "00000000000000000000"}).then(console.log);
     }, 1000);
 }
 

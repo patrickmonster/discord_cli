@@ -3,6 +3,8 @@ const DBClient = require('./DBClient');
 const { GuildMember } = require('discord.js');
 const { Sequelize, DataTypes, QueryTypes } = require('sequelize');
 
+// ----------------------------------------------------------------
+// 업적 - 리더보드형
 const tables = {
 	Achievements : [
 		{ // 업적
@@ -35,29 +37,6 @@ const tables = {
 	],
 	AchievementsData : [
 		{ // 업적 기록 - 클리어 기록
-			// id : { // 고유 사용자
-			// 	type : DataTypes.CHAR(20),
-			// 	allowNull : false,
-			// }
-			// ,Guild : { // 고유 사용자
-			// 	type : DataTypes.CHAR(20),
-			// 	defaultValue : 'public', // 공개
-			// }
-			// ,eventID : {
-			// 	type : DataTypes.INTEGER,
-			// 	allowNull : false,
-			// 	unique : "achievementsKey",
-			// } // 업적 인덱스
-			// ,createAt : { // 업적 제작일
-			// 	type : DataTypes.DATE,
-			// 	defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
-			// 	allowNull : false
-			// }
-			// ,isDeleted : { // 삭제여부
-			// 	type : DataTypes.CHAR(1),
-			// 	defaultValue : 'N',
-			// 	allowNull : false
-			// }
 			id : { // 고유 사용자
 				type : DataTypes.CHAR(20),
 				unique : "achievementsKey",
@@ -68,7 +47,7 @@ const tables = {
 				allowNull : false,
 				unique : "achievementsKey",
 			}
-			,Guild : { // 고유 사용자
+			,guild : { // 고유 사용자
 				type : DataTypes.CHAR(20),
 				defaultValue : 'public', // 공개
 			}
@@ -127,6 +106,8 @@ class AchievementsClient extends DBClient {
 	achievementDelete(user, achievement_id) {
 		return this.achievementUpdate(user, achievement_id, true);
 	}
+	
+	// 리더보드 사용자 업적 업데이트
 	achievementUpdate(user, achievement_id, isDeleted = false) {
 		const _this = this;
 		const params = [user.id, achievement_id, (typeof isDeleted === 'boolean' ? (isDeleted ? 'Y' : 'N') : isDeleted || 'N') ];
@@ -134,7 +115,7 @@ class AchievementsClient extends DBClient {
 			params.push(user.guild?.id);
 		}
 		return this.Query("UPSERT",
-			`INSERT OR REPLACE INTO "AchievementsData" (id, eventID, isDeleted${user instanceof GuildMember ? ', Guild' : ''}) VALUES(?, ?, ?${user instanceof GuildMember ? ', ?' : ''});`,
+			`INSERT OR REPLACE INTO "AchievementsData" (id, eventID, isDeleted${user instanceof GuildMember ? ', guild' : ''}) VALUES(?, ?, ?${user instanceof GuildMember ? ', ?' : ''});`,
 			...params
 			 ).then(([_, isCreate])=>{
 			console.log(_, isCreate);
@@ -167,25 +148,29 @@ class AchievementsClient extends DBClient {
 			_this.Query("UPSERT",
 				`INSERT OR REPLACE INTO Achievements (id, name, description, type, EventType, EventCount, isDeleted, parentId) VALUES(?, ?, ?, ?, ?, ?, ?, ?);`,
 				id, name, description, type,
-				EventType, EventCount || 1, typeof isDeleted == "boolean" ? (isDeleted ? 'N' : 'Y') : (isDeleted || 'N'), parentId || ""
+				EventType, EventCount || 1, typeof isDeleted == "boolean" ? (isDeleted ? 'N' : 'Y') : (isDeleted || 'N'), parentId || null
 			).catch(_this.logger.error);
 			// INSERT INTO Achievements (id, name, description, type, EventType, EventCount, createAt, isDeleted, parentId)
 		}else {
 			_this.Query.INSERT( 
 				`INSERT INTO Achievements (name, description, type, EventType, EventCount, isDeleted, parentId) VALUES(?, ?, ?, ?, ?, ?, ?);`,
-				name, description, type, EventType, EventCount || 1, typeof isDeleted == "boolean" ? (isDeleted ? 'N' : 'Y') : (isDeleted || 'N'), parentId || ""
+				name, description, type, EventType, EventCount || 1, typeof isDeleted == "boolean" ? (isDeleted ? 'N' : 'Y') : (isDeleted || 'N'), parentId || null
 			).catch(_this.logger.error);
 		}
 		
 	}
 
 	// 사용자의 모든 업적을 가져 옵니다.
-	getAchievement(id) { 
+	getAchievement(user) { 
 		const _this = this;
-		return this.Query.SELECT(`
+		const params = [user.id]
+		if( user instanceof GuildMember){
+			params.push(user.guild?.id);
+		}
+		return _this.Query.SELECT(`
 SELECT 
 	ad.id
-	, ad.eventID
+	, a.id AS eventID
 	, ad.createAt
 	, a.name
 	, a.description
@@ -193,15 +178,33 @@ SELECT
 	, a.EventType
 	, a.EventCount
 	, a.parentId
-	, a.createAt
-FROM Achievements a 
-LEFT JOIN AchievementsData ad
+	 -- , a.createAt AS 
+FROM Achievements a
+LEFT JOIN (
+	SELECT  *
+	FROM AchievementsData
+	WHERE id = ?
+	AND isDeleted = 'N'
+) ad
 ON a.id = ad.eventID
 WHERE 1=1
 AND a.isDeleted = 'N'
-AND ad.isDeleted = 'N'
-AND ad.id = ?
-		`, id).catch(_this.logger.error);
+${user instanceof GuildMember ? "AND ad.guild = ?" : ""}
+		`, ...params).catch(_this.logger.error);
+	}
+
+	// 사용자의 모든 업적을 리더보드로 나타 냅니다.
+	getReaderBord(user){
+		const _this = this;
+		return this.getAchievement(user).then(comp => {
+			const comp_count = comp.filter(({id})=> id).length;
+			return {
+				total : comp.length,
+				complet : comp_count,
+				percent : comp_count / comp.length * 100,
+				achievement : comp
+			};
+		}).catch(_this.logger.error);
 	}
 }
 

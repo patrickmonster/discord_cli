@@ -129,7 +129,7 @@ class BasicClient  extends Client
 				},
 			}).then(out => {
 				if(clientOptions.isDBQuery)
-					insertLog('02','SQL_LOG',`${Date.now().getTime() - startTime.getTime()}ms ${query} ${JSON.stringify(replacements)}`)
+					_this.insertLog('02','SQL_LOG',`${Date.now().getTime() - startTime.getTime()}ms ${query} ${JSON.stringify(replacements)}`)
 				return out;
 			});
         };
