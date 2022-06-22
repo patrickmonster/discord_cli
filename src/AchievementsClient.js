@@ -120,7 +120,6 @@ class AchievementsClient extends DBClient {
 		}
 
 		_this.Query.SELECT(`SELECT * FROM AchievementsData WHERE id = ? AND eventID = ? ${user instanceof GuildMember ? 'AND guild = ?' : ''}`, ...params).then(([isAchievement])=>{
-			// if((isDeleted && !isAchievement) || (!isDeleted && isAchievement)) return;
 			
 			if(isDeleted && isAchievement){ // 삭제0 = 존재0
 				return _this.Query.DELETE(`DELETE FROM AchievementsData WHERE id = ? AND eventID = ?`, ...params).then(_=>{
@@ -142,6 +141,12 @@ class AchievementsClient extends DBClient {
 	get achievement(){
 		const _this = this;
 		return _this.Query.SELECT(`SELECT * FROM Achievements WHERE isDeleted = 'N'`).catch(_this.logger.error);
+	}
+
+	// 업적을 조회합니다
+	getAchievement(id){
+		const _this = this;
+		return _this.Query.SELECT(`SELECT * FROM Achievements WHERE isDeleted = 'N' AND id = ?`, id).catch(_this.logger.error);
 	}
 
 
@@ -174,7 +179,7 @@ class AchievementsClient extends DBClient {
 	}
 
 	// 사용자의 모든 업적을 가져 옵니다.
-	getAchievement(user) { 
+	getAchievements(user) { 
 		const _this = this;
 		const params = [user.id]
 		if( user instanceof GuildMember){
