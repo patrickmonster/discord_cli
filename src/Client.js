@@ -12,8 +12,9 @@ const levels = {
     'debug': 0,
     'warn': 1,
     'info': 2,
-    'error': 3,
-    'none': 4
+    'none': 3,
+    'log': 3,
+    'error': 4,
 }
 
 let level = 'warn';

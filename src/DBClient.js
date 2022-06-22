@@ -104,19 +104,6 @@ const tables = {
 	}
 };
 
-function init(db){
-    db.sql("SHOWTABLES", "SELECT * FROM sqlite_master WHERE type='table';").then(tableNames=>{
-		const dbInterface = db.getQueryInterface();
-
- 		const tmp_talbes = Object.keys(tables).filter(name => !tableNames.includes(name));
-		for (const table of tmp_talbes){ 
-			dbInterface.createTable(table, tables[table]).then(() =>{
-				console.log("테이블 생성 -", table);
-			}).catch(console.error);
-		}
-    }).catch(console.error);
-}
-
 class BasicClient 
 	extends Client
 {
@@ -147,7 +134,16 @@ class BasicClient
 
 		this._db = db;
 
-        init(db);
+        // init(db);
+		const t_interface = _this.Table;
+		t_interface.getTables().then(ts => {
+			const tmp_tables = Object.keys(tables).filter(t => !ts.includes(t));
+			for (const table of tmp_tables){ 
+				t_interface.createTable(table, tables[table]).then(() =>{
+					console.log("테이블 생성 -", table);
+				}).catch(console.error);
+			}
+		}).catch(_this.logger.error);
 
 		// updateCode( path.join(__dirname, 'DBBase'))
 		// 	.forEach((value, key)=>
@@ -167,16 +163,16 @@ class BasicClient
 		this.on("channelUpdate", (oldChannel, newChannel) =>_this.updateChannelQuery(newChannel));
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		this.once("ready", _ =>{
-			insertLog('00','SERVER_LOG',`Starting discord service.... ${new Date()}\nLogged in as ${_this.user.tag}!`);
+			_this.insertLog('00','SERVER_LOG',`Starting discord service.... ${new Date()}\nLogged in as ${_this.user.tag}!`);
 		});
 
 		this.on('error', function(error) { 
-			insertLog('02','ERROR_LOG',`${error.name} ${error.stack}`);
+			_this.insertLog('02','ERROR_LOG',`${error.name} ${error.stack}`);
 		});
 
 		if(clientOptions.dbDebugLog) // 디버깅 로그 활성화인 경우에만
 			this.on('debug', function(info) { 
-				insertLog('01','DEBUG_LOG',info);
+				_this.insertLog('01','DEBUG_LOG',info);
 			});
 		
     }
@@ -210,6 +206,7 @@ class BasicClient
 		).catch(this.logger.error);
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////
 	/**
 	 * User
 	 */
@@ -222,15 +219,10 @@ class BasicClient
 		).catch(this.logger.error);
 	}
 	
-	async getUser(id){
-		return await this.Query.SELECT(`SELECT * FROM "User" WHERE "id" = ? LIMIT 1`, id).then(([user])=> user);
+	getUser(id){
+		return this.Query.SELECT(`SELECT * FROM "User" WHERE "id" = ? LIMIT 1`, id).then(([user])=> user);
 	}
-
-	set Data({
-		key, value
-	}){
-
-	}
+	/////////////////////////////////////////////////////////////////////////////////////////////
 
     get Query(){
         const { sql } = this._db;
@@ -242,6 +234,7 @@ class BasicClient
     }
 
 	get Table(){
+		const _this = this;
 		const dbInterface = this._db.getQueryInterface();
 		const { addColumn, changeColumn } = dbInterface;
 
@@ -265,6 +258,7 @@ class BasicClient
 					type : column(type, options.typeSize),
 				});
 			},getColumns : (table) => dbInterface.describeTable(table),
+			getTables : () => _this._db.sql("SHOWTABLES", "SELECT * FROM sqlite_master WHERE type='table';"),
 		};
 		for (const name of ["createTable","dropTable","renameTable","tableExists","describeTable","removeColumn","renameColumn","addIndex","removeIndex"]){
 			out[name] = (...args)=> 
