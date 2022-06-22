@@ -101,14 +101,14 @@ class AchievementsClient extends DBClient {
 
 	// 업적 완료 이벤트 - 사용자가 업적을 완료 할 경우
 	achievementComplete(user, achievement_id) { 
-		return this.achievementUpdate(user, achievement_id, false);
+		this.achievementUpdate(user, achievement_id, false);
 	}
 	achievementCreate(user, achievement_id) { 
-		return this.achievementUpdate(user, achievement_id, false);
+		this.achievementUpdate(user, achievement_id, false);
 	}
 
 	achievementDelete(user, achievement_id) {
-		return this.achievementUpdate(user, achievement_id, true);
+		this.achievementUpdate(user, achievement_id, true);
 	}
 	
 	// 리더보드 사용자 업적 업데이트

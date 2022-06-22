@@ -17,9 +17,8 @@ import {
 declare module 'discord.js';
 declare module 'discord-modals';
 
-import {
-    QueryTypes
-} from 'sequelize'
+
+export { QueryTypes } from 'sequelize'
 //////////////////////////////////////////////////////
 
 export const enum MessageButtonStyles {
@@ -28,8 +27,7 @@ export const enum MessageButtonStyles {
     SUCCESS = 3,
     DANGER = 4,
     LINK = 5,
-  }
-
+}
 //////////////////////////////////////////////////////
 interface HelpCommand {
     name : string;
@@ -114,6 +112,7 @@ class BaseClient extends Client {
     public defer(interaction: Interaction, target: (...args: any[]) => Awaitable<void>): void;
 }
 
+//////////////////////////////////////////////////////
 function Query(type: string, query: string, ...replacements: Object[]): Promise<any>;
 interface QueryObject{
     Select : Query;
@@ -132,8 +131,22 @@ class DBClient extends BaseClient {
     public getUser(id : string): any;
 }
 
+//////////////////////////////////////////////////////
+
+class AchievementsClient extends DBClient{
+    public constructor(options: BasicClientOptions);
+
+    public achievementComplete(user: User, id : number) : void;
+    public achievementCreate(user: User, id : number) : void;
+    public achievementDelete(user: User, id : number) : void;
+    public achievementUpdate(user: User, id : number, isDeleted : boolean) : void;
+    
+}
+
+//////////////////////////////////////////////////////
 export type Client = BaseClient;
 export type DBClient = DBClient;
+export type AchievementsClient = AchievementsClient;
 
 
 export interface AutoSharding extends ShardingManager {
