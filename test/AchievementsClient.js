@@ -9,8 +9,11 @@ const client = new AchievementsClient({
 });
 
 client.on("ready", ready)
-    .on("AchievementCreate", function(User, achievement_id, guild){
-        console.log("업적 이벤트",User, achievement_id, guild);
+    .on("achievementCreate", function(User, achievement_id){
+        console.log("업적 생성",User, achievement_id);
+    })
+    .on("achievementDelete", function(User, achievement_id){
+        console.log("업적 삭제",User, achievement_id);
     })
 
 function ready(){
@@ -30,14 +33,16 @@ function ready(){
     //     , EventType : "CreatedMember"
     // }
 
-    // client.achievementComplete({id : "00000000000000000000"}, 2);
+    client.achievementComplete({id : "00000000000000000000"}, 6);
 
     setTimeout(function(){
+        // client.achievementComplete({id : "00000000000000000000"}, 6);
+        client.achievementDelete({id : "00000000000000000000"}, 6);
         // client.achievement.then(achievement => {
         //     console.log("조회",achievement);
         // })
         // client.getAchievement({id : "00000000000000000000"}).then(console.log);
-        client.getReaderBord({id : "00000000000000000000"}).then(console.log);
+        // client.getReaderBord({id : "00000000000000000000"}).then(console.log);
     }, 1000);
 }
 

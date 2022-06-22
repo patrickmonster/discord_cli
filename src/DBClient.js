@@ -124,7 +124,7 @@ class BasicClient  extends Client
             return db.query(`${query}`, { 
 				type: QueryTypes[type], 
 				replacements, logging : (query)=> {
-					_this.logger.info("// == sql");
+					_this.logger.info("// == sql", type);
 					_this.logger.info(query)
 				},
 			}).then(out => {
@@ -228,7 +228,6 @@ class BasicClient  extends Client
     }
 
 	get Table(){
-		const _this = this;
 		const dbInterface = this._db.getQueryInterface();
 		const { addColumn, changeColumn } = dbInterface;
 

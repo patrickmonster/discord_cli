@@ -1,0 +1,45 @@
+<mxfile host="65bd71144e">
+    <diagram id="0e6eBgiajXM35pO396me" name="init">
+        <mxGraphModel dx="568" dy="411" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="&lt;h1&gt;업적&lt;/h1&gt;&lt;p&gt;사용자 업적 관리&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="20" y="10" width="190" height="120" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="bsrS6r1wRIVsGqD2i_AY" name="achievementUpdate">
+        <mxGraphModel dx="676" dy="690" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="msm4dlls7s16n3U5t0tj-0"/>
+                <mxCell id="msm4dlls7s16n3U5t0tj-1" parent="msm4dlls7s16n3U5t0tj-0"/>
+                <mxCell id="msm4dlls7s16n3U5t0tj-2" value="업적 업데이트" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="msm4dlls7s16n3U5t0tj-1">
+                    <mxGeometry x="20" y="10" width="80" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="msm4dlls7s16n3U5t0tj-3" value="정보 업데이트 요청" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;" vertex="1" parent="msm4dlls7s16n3U5t0tj-1">
+                    <mxGeometry x="20" y="90" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="msm4dlls7s16n3U5t0tj-4" value="정보 편집&lt;br&gt;사용자정보, 업적id" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="msm4dlls7s16n3U5t0tj-1">
+                    <mxGeometry x="230" y="90" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="msm4dlls7s16n3U5t0tj-6" value="기존 업적 정보 불러오기(upsert 지원안함)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="msm4dlls7s16n3U5t0tj-1">
+                    <mxGeometry x="205" y="230" width="170" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="msm4dlls7s16n3U5t0tj-7" value="&lt;div style=&quot;color: rgb(196 , 201 , 226) ; background-color: rgb(41 , 45 , 61) ; font-family: &amp;#34;consolas&amp;#34; , &amp;#34;courier new&amp;#34; , monospace ; font-size: 14px ; line-height: 19px&quot;&gt;&lt;span style=&quot;color: #c3e88d&quot;&gt;AchievementsData&lt;/span&gt;&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="msm4dlls7s16n3U5t0tj-1">
+                    <mxGeometry x="490" y="230" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="msm4dlls7s16n3U5t0tj-8" value="데이터 삭제 여부" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="msm4dlls7s16n3U5t0tj-1">
+                    <mxGeometry x="200" y="480" width="180" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="msm4dlls7s16n3U5t0tj-9" value="해당 데이터 존재여부" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="msm4dlls7s16n3U5t0tj-1">
+                    <mxGeometry x="230" y="350" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="msm4dlls7s16n3U5t0tj-13" value="해당 데이터 존재여부" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="msm4dlls7s16n3U5t0tj-1">
+                    <mxGeometry x="230" y="640" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

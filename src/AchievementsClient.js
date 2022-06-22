@@ -74,6 +74,10 @@ const tables = {
 /**
  * 업적 클라이언트
  *  - 사용자 업적을 관제함
+ * 
+ * event
+ *  - achievementCreate(user : User | GuildMember ) // 사용자가 신규 업적을 달성함
+ *  - 
  */
 class AchievementsClient extends DBClient {
     constructor(options) {
@@ -111,16 +115,26 @@ class AchievementsClient extends DBClient {
 	achievementUpdate(user, achievement_id, isDeleted = false) {
 		const _this = this;
 		const params = [user.id, achievement_id, (typeof isDeleted === 'boolean' ? (isDeleted ? 'Y' : 'N') : isDeleted || 'N') ];
-		if( user instanceof GuildMember){
+		if( user instanceof GuildMember){	
 			params.push(user.guild?.id);
 		}
-		return this.Query("UPSERT",
-			`INSERT OR REPLACE INTO "AchievementsData" (id, eventID, isDeleted${user instanceof GuildMember ? ', guild' : ''}) VALUES(?, ?, ?${user instanceof GuildMember ? ', ?' : ''});`,
-			...params
-			 ).then(([_, isCreate])=>{
-			console.log(_, isCreate);
-			if( isCreate ) // 업적 완료 이벤트
-				_this.emit("AchievementDelete", user, achievement_id,);
+
+		_this.Query.SELECT(`SELECT * FROM AchievementsData WHERE id = ? AND eventID = ? ${user instanceof GuildMember ? 'AND guild = ?' : ''}`, ...params).then(([isAchievement])=>{
+			// if((isDeleted && !isAchievement) || (!isDeleted && isAchievement)) return;
+			
+			if(isDeleted && isAchievement){ // 삭제0 = 존재0
+				return _this.Query.DELETE(`DELETE FROM AchievementsData WHERE id = ? AND eventID = ?`, ...params).then(_=>{
+					_this.emit("achievementDelete", user, achievement_id);  // 업적이 없음
+				});
+			}
+
+			if(!isDeleted && !isAchievement){ // 삭제x = 존재x
+				return _this.Query.INSERT(`INSERT INTO "AchievementsData" (id, eventID, isDeleted${user instanceof GuildMember ? ', guild' : ''}) VALUES(?, ?, ?${user instanceof GuildMember ? ', ?' : ''});`,...params).then(_=>{
+					_this.emit("achievementCreate", user, achievement_id);  // 업적이 없음
+				});
+			}
+
+			return {};
 		}).catch(this.logger.error);
 	}
 
@@ -150,7 +164,6 @@ class AchievementsClient extends DBClient {
 				id, name, description || '-', type || '-',
 				EventType || '-', EventCount || 1, typeof isDeleted == "boolean" ? (isDeleted ? 'N' : 'Y') : (isDeleted || 'N'), parentId || null
 			).catch(_this.logger.error);
-			// INSERT INTO Achievements (id, name, description, type, EventType, EventCount, createAt, isDeleted, parentId)
 		}else {
 			_this.Query.INSERT( 
 				`INSERT INTO Achievements (name, description, type, EventType, EventCount, isDeleted, parentId) VALUES(?, ?, ?, ?, ?, ?, ?);`,
