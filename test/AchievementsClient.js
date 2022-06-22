@@ -23,12 +23,12 @@ function ready(){
 
     // client.Table.createTable("test", table);
     // client.Table.removeColumn("User", "test")//.then(_=>)
-    client.achievement = {
-        name : "일단 넣어 업적"
-        , description : "테스트 업적"
-        , type : "TEST"
-        , EventType : "CreatedMember"
-    }
+    // client.achievement = {
+    //     name : "일단 넣어 업적"
+    //     , description : "테스트 업적"
+    //     , type : "TEST"
+    //     , EventType : "CreatedMember"
+    // }
 
     // client.achievementComplete({id : "00000000000000000000"}, 2);
 

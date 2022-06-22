@@ -136,7 +136,7 @@ class AchievementsClient extends DBClient {
 		const _this = this;
 		
 		if( !achiev.name ){
-			throw new Error("achiev.name is 필수값입니다.");
+			throw new Error("업적의 이름은 필수값입니다. { name }");
 		}
 
 		const {
@@ -147,14 +147,14 @@ class AchievementsClient extends DBClient {
 		if( id ){
 			_this.Query("UPSERT",
 				`INSERT OR REPLACE INTO Achievements (id, name, description, type, EventType, EventCount, isDeleted, parentId) VALUES(?, ?, ?, ?, ?, ?, ?, ?);`,
-				id, name, description, type,
-				EventType, EventCount || 1, typeof isDeleted == "boolean" ? (isDeleted ? 'N' : 'Y') : (isDeleted || 'N'), parentId || null
+				id, name, description || '-', type || '-',
+				EventType || '-', EventCount || 1, typeof isDeleted == "boolean" ? (isDeleted ? 'N' : 'Y') : (isDeleted || 'N'), parentId || null
 			).catch(_this.logger.error);
 			// INSERT INTO Achievements (id, name, description, type, EventType, EventCount, createAt, isDeleted, parentId)
 		}else {
 			_this.Query.INSERT( 
 				`INSERT INTO Achievements (name, description, type, EventType, EventCount, isDeleted, parentId) VALUES(?, ?, ?, ?, ?, ?, ?);`,
-				name, description, type, EventType, EventCount || 1, typeof isDeleted == "boolean" ? (isDeleted ? 'N' : 'Y') : (isDeleted || 'N'), parentId || null
+				name, description || '-', type || '-', EventType || '-', EventCount || 1, typeof isDeleted == "boolean" ? (isDeleted ? 'N' : 'Y') : (isDeleted || 'N'), parentId || null
 			).catch(_this.logger.error);
 		}
 		
@@ -201,7 +201,7 @@ ${user instanceof GuildMember ? "AND ad.guild = ?" : ""}
 			return {
 				total : comp.length,
 				complet : comp_count,
-				percent : comp_count / comp.length * 100,
+				percent : (comp_count / comp.length * 100).toFixed(2),
 				achievement : comp
 			};
 		}).catch(_this.logger.error);
