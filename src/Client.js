@@ -1,5 +1,6 @@
 'use strict';
 const { Client, ClientOptions } = require('discord.js');
+const EventEmitter = require('node:events');
 
 const fs = require('fs');
 const path = require("path");
@@ -25,13 +26,14 @@ const formattedDate = _ => {
     const seconds = `00${date.getSeconds()}`.slice(-2);
     return `${hours}:${mins}:${seconds}`;
 }
-const log = lvl => {
-    return (...args) => {
-        if (levels[lvl] >= levels[level])
-            console.log(`${formattedDate()}]${name}`, ...args);
-    }
-}
-class BasicClient extends Client{
+
+
+// extends EventEmitter
+class BasicClient 
+    extends 
+        // Client
+        EventEmitter
+    {
     /**
      * 
      * @param { ClientOptions } clientOptions 
@@ -54,8 +56,8 @@ class BasicClient extends Client{
         else {
             fs.mkdirSync(baseDir);
             console.error("이벤트 폴더를 찾을 수 없습니다!", baseDir);
-            require('../cli/event');
             console.error("설정이 완료되면, 프로그램을 다시 시작해 주세요.");
+            require('../cli/event');
         }
     }
 
@@ -64,15 +66,18 @@ class BasicClient extends Client{
      */
     get logger(){
         const name = this.user?.tag || "BOT";
-        const log = (...args) => {
-            if (4 >= levels[level])
-                console.log(`${formattedDate()}]${name}`, ...args);
-        };
-        log.log = log('none');
-        log.info = log('info');
-        log.warn = log('warn');
-        log.error = log('error');
-        log.debug = log('debug');
+        const logPrint = (lvl) => {
+            return (...args)=>{    
+                if (levels[lvl] >= levels[level])
+                    console.log(`${formattedDate()}]${name}`, ...args);
+            }
+        }
+        const log = logPrint('log');
+        log.log = logPrint('none');
+        log.info = logPrint('info');
+        log.warn = logPrint('warn');
+        log.error = logPrint('error');
+        log.debug = logPrint('debug');
         return log;
     }
 

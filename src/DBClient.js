@@ -104,8 +104,7 @@ const tables = {
 	}
 };
 
-class BasicClient 
-	extends Client
+class BasicClient  extends Client
 {
 
     constructor(clientOptions){
@@ -124,7 +123,10 @@ class BasicClient
 			const startTime = new Date();
             return db.query(`${query}`, { 
 				type: QueryTypes[type], 
-				replacements, logging : _this.logger.info
+				replacements, logging : (query)=> {
+					_this.logger.info("// == sql");
+					_this.logger.info(query)
+				},
 			}).then(out => {
 				if(clientOptions.isDBQuery)
 					insertLog('02','SQL_LOG',`${Date.now().getTime() - startTime.getTime()}ms ${query} ${JSON.stringify(replacements)}`)
@@ -163,7 +165,7 @@ class BasicClient
 		this.on("channelUpdate", (oldChannel, newChannel) =>_this.updateChannelQuery(newChannel));
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		this.once("ready", _ =>{
-			_this.insertLog('00','SERVER_LOG',`Starting discord service.... ${new Date()}\nLogged in as ${_this.user.tag}!`);
+			_this.insertLog('00','SERVER_LOG',`Starting discord service.... ${new Date()}\nLogged in as ${_this.user?.tag}!`);
 		});
 
 		this.on('error', function(error) { 
@@ -176,14 +178,6 @@ class BasicClient
 			});
 		
     }
-	/*
-	get logger (){
-		return {
-			error : console.error
-		}
-	}
-	on(){}
-	once(){} */
 
 	updateGuildQuery({id, name, ownerId}){
 		this._db.sql("UPSERT", 
@@ -219,9 +213,9 @@ class BasicClient
 		).catch(this.logger.error);
 	}
 	
-	getUser(id){
+	getUser({id}){
 		return this.Query.SELECT(`SELECT * FROM "User" WHERE "id" = ? LIMIT 1`, id).then(([user])=> user);
-	}
+	}	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 
     get Query(){
@@ -258,7 +252,7 @@ class BasicClient
 					type : column(type, options.typeSize),
 				});
 			},getColumns : (table) => dbInterface.describeTable(table),
-			getTables : () => _this._db.sql("SHOWTABLES", "SELECT * FROM sqlite_master WHERE type='table';"),
+			getTables : () =>	dbInterface.showAllSchemas().then(tables => tables.map(({name}) => name)),
 		};
 		for (const name of ["createTable","dropTable","renameTable","tableExists","describeTable","removeColumn","renameColumn","addIndex","removeIndex"]){
 			out[name] = (...args)=> 
