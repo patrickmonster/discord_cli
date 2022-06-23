@@ -2,7 +2,7 @@ import {
     Client as BaseClient
     , ShardingManager
     , ShardingManagerOptions
-    , ApplicationCommand
+    , ApplicationCommandData
     , Collection
     , ClientOptions
     , Interaction
@@ -50,14 +50,14 @@ interface HelpCommand {
 }
 
 interface GetCommand {
-    command : Collection<Snowflake, V extends any>;
+    command : Collection<Snowflake, ApplicationCommandData>;
     
     get(cmd): (...args : any[])=> Awaitable<void>;
     add(fileName : string) : void; // 파일 추가 (탐색 폴더내 추가된 파일)
     execute(interaction : Interaction | Message) : void;
-    forEach(callback : (v : any, k : string, cmds :  ApplicationCommand[]) => k[]);
+    forEach(callback : (v : any, k : string, cmds :  ApplicationCommandData[]) => k[]): void;
     getHelp(): HelpCommand[];
-    getCommands(): ApplicationCommand[];
+    getCommands(): ApplicationCommandData[];
 }
 //////////////////////////////////////////////////////
 export interface BasicClientOptions extends ClientOptions {
@@ -107,16 +107,7 @@ export interface AchievementBord {
 
 //////////////////////////////////////////////////////
 
-
-export interface BasicCommands extends GetCommand {
-    options: ApplicationCommand[];
-    execute: (event: any, subcommand: string, ...args: string[]) => Awaitable<void>;
-}
-
-//////////////////////////////////////////////////////
-
-export function LoadCommands(target: string): BasicCommands;
-export function LoadSubCommands(target: string): GetCommand;
+export function LoadCommands(target: string): GetCommand;
 
 //////////////////////////////////////////////////////
 
