@@ -3,64 +3,30 @@ const DBClient = require('./DBClient');
 const { GuildMember } = require('discord.js');
 const { Sequelize, DataTypes, QueryTypes } = require('sequelize');
 
+const ColumnType = require("./Util/DBColumn")
 // ----------------------------------------------------------------
 // 업적 - 리더보드형
 const tables = {
 	Achievements : [
 		{ // 업적
-			id : { // 고유 ID
-				type : DataTypes.INTEGER,
-				primaryKey : true,
-				autoIncrement : true,
-			}
-			,name : DataTypes.CHAR(100) // 업적이름
-			,description : DataTypes.CHAR(1000) // 업적이름
-			,type : DataTypes.CHAR(20) // 업적 타입
-			,EventType : DataTypes.CHAR(50) // 업적 이벤트
-			,EventCount : {  // 업적 횟수(요건 만족 회수)
-				type : DataTypes.INTEGER,
-				defaultValue : 1,
-				allowNull : false
-			}
-			,createAt : { // 업적 제작일
-				type : DataTypes.DATE,
-				defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
-				allowNull : false
-			}
-			,isDeleted : { // 삭제여부
-				type : DataTypes.CHAR(1),
-				defaultValue : 'N',
-				allowNull : false
-			}
-			,parentId : DataTypes.CHAR(20) // 선행 업적
+			id : ColumnType.idx
+			,name : ColumnType.CHAR(100) // 업적이름
+			,description : ColumnType.CHAR(1000) // 업적이름
+			,type : ColumnType.CHAR(20) // 업적 타입
+			,EventType : ColumnType.CHAR(50) // 업적 이벤트
+			,EventCount : { ...ColumnType.INTEGER, defaultValue : 1 } // 업적 횟수(요건 만족 회수)
+			,createAt : ColumnType.createAt
+			,isDeleted : ColumnType.Bool
+			,parentId : ColumnType.Snowflake
 		},
 	],
 	AchievementsData : [
 		{ // 업적 기록 - 클리어 기록
-			id : { // 고유 사용자
-				type : DataTypes.CHAR(20),
-				unique : "achievementsKey",
-				allowNull : false
-			}
-			,eventID : {
-				type : DataTypes.INTEGER,
-				allowNull : false,
-				unique : "achievementsKey",
-			}
-			,guild : { // 고유 사용자
-				type : DataTypes.CHAR(20),
-				defaultValue : 'public', // 공개
-			}
-			,createAt : { // 업적 제작일
-				type : DataTypes.DATE,
-				defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
-				allowNull : false
-			}
-			,isDeleted : { // 삭제여부
-				type : DataTypes.CHAR(1),
-				defaultValue : 'N',
-				allowNull : false
-			}
+			id : ColumnType.id
+			,eventID : ColumnType.INTEGER
+			,guild : ColumnType.Snowflake
+			,createAt : ColumnType.createAt
+			,isDeleted : ColumnType.Bool
 		},
 		{
 			uniqueKeys: {

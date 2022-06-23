@@ -6,35 +6,21 @@ const path = require("path");
 
 // const updateCode = require("./Util/updateCode");
 
+const ColumnType = require("./Util/DBColumn")
+
 const { Sequelize, DataTypes, QueryTypes } = require('sequelize');
 // Sequelize.DATA
 /* ============================================================================================ */
 const tables = {
 	Channel : {
-		id : {
-			type : DataTypes.CHAR(20),
-			primaryKey : true,
-			allowNull : false
-		}
-		,name : DataTypes.CHAR(100)
-		,type : DataTypes.CHAR(20)
-		,createAt : DataTypes.DATE
-		,isDeleted : {
-			type : DataTypes.CHAR(1),
-			defaultValue : 'N',
-			allowNull : false
-		}
-		,guild_id :  {
-			type : DataTypes.CHAR(20),
-			defaultValue : 'DM',
-			allowNull : false
-		}
-		,parentId : DataTypes.CHAR(20)
-		,editAt : {
-			type : DataTypes.DATE,
-			defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
-			allowNull : false
-		}
+		id : ColumnType.id
+		,name : ColumnType.CHAR(100)
+		,type : ColumnType.CHAR(20)
+		,createAt : ColumnType.createAt
+		,isDeleted : ColumnType.Bool
+		,guild_id : ColumnType.CHAR(20, 'DM')
+		,parentId : ColumnType.CHAR(20)
+		,editAt : ColumnType.createAt
 	},
 	Cache : {
 		key : {
@@ -42,65 +28,31 @@ const tables = {
 			primaryKey : true,
 			allowNull : false
 		},
-		value : {
-			type : DataTypes.TEXT
-		},
+		value : ColumnType.TEXT,
 	},
 	Guild : {
-		id : {
-			type : DataTypes.CHAR(20),
-			primaryKey : true,
-			allowNull : false
-		}
-		,name : DataTypes.CHAR(100)
-		,ownerId : DataTypes.CHAR(20)
-		,joinedTimestamp : {
-			type : DataTypes.DATE,
-			defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
-			allowNull : false
-		}
-		,isDeleted : {
-			type : DataTypes.CHAR(1),
-			defaultValue : 'N',
-			allowNull : false
-		}
+		id : ColumnType.id
+		, name : ColumnType.CHAR(100)
+		, ownerId : ColumnType.CHAR(20)
+		, joinedTimestamp : ColumnType.createAt
+		, isDeleted : ColumnType.Bool
 	},
 	ServerLog : {
-		timeAt : {
-			type : DataTypes.DATE,
-			defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
-			allowNull : false
-		}
-		,owner : DataTypes.CHAR(20)
-		,msg : DataTypes.TEXT(65535)
-		,type : DataTypes.CHAR(2)
+		timeAt : ColumnType.createAt
+		, owner : DataTypes.CHAR(20)
+		, msg : DataTypes.TEXT(65535)
+		, type : DataTypes.CHAR(2)
 	},
 	User : {
-		id : {
-			type : DataTypes.CHAR(20),
-			primaryKey : true,
-			allowNull : false
-		},
-		bot : {
-			type : DataTypes.CHAR(1),
-			defaultValue : 'N',
-			allowNull : false
-		}
-		,accentColor : DataTypes.INTEGER
-		,tag : DataTypes.CHAR(200)
-		,username : DataTypes.CHAR(100)
-		,avatar : DataTypes.CHAR(100)
-		,banner : DataTypes.CHAR(100)
-		,type : {
-			type : DataTypes.CHAR(1),// 사용자정보 - 관리 혹은 지정 상태
-			defaultValue : 'U',
-			allowNull : false
-		}
-		,createdAt :{
-			type : DataTypes.DATE,
-			defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
-			allowNull : false
-		}
+		id : ColumnType.id
+		, bot : ColumnType.CHAR(1, 'N')
+		, accentColor : ColumnType.INTEGER
+		, tag : ColumnType.CHAR(200)
+		, username : ColumnType.CHAR(100)
+		, avatar : ColumnType.CHAR(100)
+		, banner : ColumnType.CHAR(100)
+		, type : ColumnType.CHAR(1, 'U')
+		, createdAt : ColumnType.createAt
 	}
 };
 
