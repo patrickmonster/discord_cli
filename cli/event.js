@@ -157,13 +157,16 @@ function getType(type){
 // const baseDir = path.join(process.cwd(), "event");
 // !fs.existsSync(baseDir) && fs.mkdirSync(baseDir);
 
+let baseDir;
+
 inquirer.prompt({
     name: "target",
     message: "이벤트가 있는 폴더를 선택 해 주세요 :",
     type: "list",
     choices: folders
 }).then(({target})=>{
-    const commandFolders = fs.readdirSync(target).filter(file => file.endsWith('.js'));
+    baseDir = target;
+    const commandFolders = fs.readdirSync(baseDir).filter(file => file.endsWith('.js'));
     return inquirer
         .prompt({
             name: "events",
@@ -185,7 +188,7 @@ inquirer.prompt({
         }).join("\n");
 
         fs.writeFileSync(
-            path.join(process.cwd(), "event", `${event}.js`),`'use strict';
+            path.join(process.cwd(), baseDir, `${event}.js`),`'use strict';
 ${discord_js.size ? `const { ${Array.from(discord_js).join(", ")} } = require('discord.js')` : ""} // 추가 라이브러리
 /**
 * ${event}.js - 클라이언트 이벤트
