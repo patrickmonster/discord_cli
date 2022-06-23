@@ -124,6 +124,9 @@ Disocrd - Commands update tool
 ### 변경기록
 
 1.1.9
+> DB 타입형 추가
+
+1.1.9
 > 이벤트 기본경로 문제 수정
 
 1.1.8
