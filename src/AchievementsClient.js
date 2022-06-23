@@ -151,7 +151,7 @@ class AchievementsClient extends DBClient {
 
 
 	// 업적을 추가합니다.
-	set achievement(achiev = {}){
+	set achievements(achiev = {}){
 		const _this = this;
 		
 		if( !achiev.name ){

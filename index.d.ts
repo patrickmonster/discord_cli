@@ -12,14 +12,42 @@ import {
     , MessageButtonOptions
     , MessageEmbed
     , User
+    , Snowflake
+    , AnyChannel
+    , Guild
 } from  'discord.js';
 
 declare module 'discord.js';
 declare module 'discord-modals';
 
 
-export { QueryTypes } from 'sequelize'
+export { 
+    TableName,
+    QueryTypes, 
+    QueryInterface,
+    ColumnsDescription,
+    DataType,
+    ModelAttributeColumnOptions,
+    QueryInterfaceOptions,
+} from 'sequelize'
 //////////////////////////////////////////////////////
+
+// type UserList<T,N extends number> = _UserList<T, N , []>;
+// type _UserList<T, N extends number, R extends unknown[]> = R['length'] extends N ? R : _UserList<T, N, [T, ...R]>;
+
+interface MaxString<L extends number> extends string{
+    length : L;
+}
+
+type LengthString<Max> = string & {
+    StringOfLength: unique symbol // this is the phantom type
+};
+  
+
+enum TrueFalse {
+    True = "Y",
+    False = "N",
+}
 
 export const enum MessageButtonStyles {
     PRIMARY = 1,
@@ -84,6 +112,28 @@ export interface Logger {
     setName(string : string): void;
 }
 
+export interface Achievement {
+    id? : number;
+    name : string;
+    description? : string;
+    type? : string;
+    EventType? : string;
+    EventCount? : number
+    isDeleted? : TrueFalse;
+    parentId? : number;
+}
+
+export interface AchievementUser extends Achievement {
+    id? : number;
+    createAt : Date;
+}
+export interface AchievementBord {
+    total : number;
+    complet : number;
+    percent : number;
+    achievemen : AchievementUser[]
+}
+
 //////////////////////////////////////////////////////
 
 
@@ -121,14 +171,35 @@ interface QueryObject{
     DELETE : Query;
 }
 
+interface DBLOGTYPE {
+    DEBUG_LOG  : "DEBUG_LOG",
+    ERROR_LOG  :  "ERROR_LOG",
+    SERVER_LOG :  "SERVER_LOG",
+    DISCORD_LOG :  "DISCORD_LOG",
+    DATABASE_LOG :  "DATABASE_LOG",
+}
+
+interface TableQueryInterface extends QueryInterface {
+    addColumn(tableName: TableName, attributeName: string, dataTypeOrOptions?: DataType | ModelAttributeColumnOptions, options?: QueryInterfaceOptions) : Promise<void>;
+    changeColumn(tableName: TableName, attributeName: string, dataTypeOrOptions?: DataType | ModelAttributeColumnOptions, options?: QueryInterfaceOptions) : Promise<void>;
+    public getColumns(TableName): Promise<ColumnsDescription>;
+    public getTables() : Promise<string[]>;
+}
+
 class DBClient extends BaseClient {
     public constructor(options: BasicDBClientOptions);
 
     public Query : Query;
     public Query : QueryObject;
 
+    public Table : TableQueryInterface;
+
     public set User(user: User);
     public getUser(id : string): any;
+
+    public updateGuildQuery(guild : Guild): void;
+    public updateChannelQuery(channel : AnyChannel): void;
+    public insertLog(type : string, owner : DBLOGTYPE | Snowflake, message : string): void;
 }
 
 //////////////////////////////////////////////////////
@@ -141,6 +212,11 @@ class AchievementsClient extends DBClient{
     public achievementDelete(user: User, id : number) : void;
     public achievementUpdate(user: User, id : number, isDeleted : boolean) : void;
     
+    public achievement : Achievement; // 생성
+    public readonly achievements : Promise<Achievement>; // 조회
+
+    public getAchievements(user: User) : Promise<AchievementUser>;
+    public getReaderBord(user: User) : Promise<AchievementBord>;
 }
 
 //////////////////////////////////////////////////////

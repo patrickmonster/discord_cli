@@ -185,10 +185,11 @@ class BasicClient  extends Client
 			id, name, ownerId, 'N'
 		).catch(_this.logger.error);
 	}
-	updateChannelQuery({id, name, type, guildId :  guild_id, parentId}){
+	updateChannelQuery({id, name, type, guild, parentId}){
+		
 		this._db.sql("UPSERT", 
 			`INSERT OR REPLACE INTO Channel (id, name, "type", isDeleted, guild_id, parentId, editAt) VALUES (?, ?, ?, 'N',?, ?, CURRENT_TIMESTAMP)`, 
-			id, name, type, guild_id, parentId
+			id, name, type, guild?.id || "public", parentId
 		).catch(_this.logger.error);
 	}
 
