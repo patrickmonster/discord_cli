@@ -34,14 +34,6 @@ export {
 
 // type UserList<T,N extends number> = _UserList<T, N , []>;
 // type _UserList<T, N extends number, R extends unknown[]> = R['length'] extends N ? R : _UserList<T, N, [T, ...R]>;
-
-interface MaxString<L extends number> extends string{
-    length : L;
-}
-
-type LengthString<Max> = string & {
-    StringOfLength: unique symbol // this is the phantom type
-};
   
 
 enum TrueFalse {

@@ -1,7 +1,6 @@
 'use strict';
 const DBClient = require('./DBClient');
 const { GuildMember } = require('discord.js');
-const { Sequelize, DataTypes, QueryTypes } = require('sequelize');
 
 const ColumnType = require("./Util/DBColumn")
 // ----------------------------------------------------------------
