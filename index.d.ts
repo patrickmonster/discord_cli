@@ -1,20 +1,22 @@
 import {
-    Client
+    Client as BaseClient
     , ShardingManager
     , ShardingManagerOptions
-    , BitFieldResolvable
     , ApplicationCommand
     , Collection
     , ClientOptions
+    , Interaction
     , MessageSelectMenuOptions
     , MessageSelectOptionData
     , MessageActionRow
     , MessageButtonOptions
     , MessageEmbed
+    , Message
     , User
     , Snowflake
     , AnyChannel
     , Guild
+    , Awaitable
 } from  'discord.js';
 
 declare module 'discord.js';
@@ -22,6 +24,7 @@ declare module 'discord-modals';
 
 
 export { 
+    Sequelize,
     TableName,
     QueryTypes, 
     QueryInterface,
@@ -31,15 +34,6 @@ export {
     QueryInterfaceOptions,
 } from 'sequelize'
 //////////////////////////////////////////////////////
-
-// type UserList<T,N extends number> = _UserList<T, N , []>;
-// type _UserList<T, N extends number, R extends unknown[]> = R['length'] extends N ? R : _UserList<T, N, [T, ...R]>;
-  
-
-enum TrueFalse {
-    True = "Y",
-    False = "N",
-}
 
 export const enum MessageButtonStyles {
     PRIMARY = 1,
@@ -56,10 +50,14 @@ interface HelpCommand {
 }
 
 interface GetCommand {
-    command : Collection;
+    command : Collection<Snowflake, V extends any>;
+    
     get(cmd): (...args : any[])=> Awaitable<void>;
-    getApp(): ApplicationCommand[];
+    add(fileName : string) : void; // 파일 추가 (탐색 폴더내 추가된 파일)
+    execute(interaction : Interaction | Message) : void;
+    forEach(callback : (v : any, k : string, cmds :  ApplicationCommand[]) => k[]);
     getHelp(): HelpCommand[];
+    getCommands(): ApplicationCommand[];
 }
 //////////////////////////////////////////////////////
 export interface BasicClientOptions extends ClientOptions {
@@ -68,25 +66,6 @@ export interface BasicClientOptions extends ClientOptions {
 
 export interface BasicDBClientOptions extends ClientOptions {
     dbDir? : string;
-}
-
-export interface AutoShardingOptions {
-    closeTimeout?: number;
-    makeCache?: String;
-    allowedMentions?: MessageMentionOptions;
-    invalidRequestWarningInterval?: number;
-    partials?: PartialTypes[];
-    restWsBridgeTimeout?: number;
-    restTimeOffset?: number;
-    restRequestTimeout?: number;
-    restGlobalRateLimit?: number;
-    restSweepInterval?: number;
-    retryLimit?: number;
-    failIfNotExists?: boolean;
-    userAgentSuffix?: string[];
-    presence?: PresenceData;
-    intents: BitFieldResolvable<number>;
-    waitGuildTimeout?: number;
 }
 
 export interface BasicTotalGuild {
@@ -141,12 +120,17 @@ export function LoadSubCommands(target: string): GetCommand;
 
 //////////////////////////////////////////////////////
 
-class BaseClient extends Client {
+enum TrueFalse {
+    True = "Y",
+    False = "N",
+}
+
+export class Client extends BaseClient {
     public constructor(options: BasicClientOptions);
     getTotalGuild() : BasicTotalGuild; // 길드 인원수를 가져옴
     
-    public logger : Logger;
-    public logger(...args: any[]) : void;
+    // public logger : Logger;
+    // public logger(...args: any[]) : void;
     public getMenu(data?: MessageSelectMenuOptions, ...options: MessageSelectOptionData[]): MessageActionRow[];
     public getButton( ...options: MessageButtonOptions[]): MessageActionRow[];
     public getIndexButton(length: number, index: number, ...options : MessageButtonStyles): MessageActionRow[];
@@ -156,11 +140,14 @@ class BaseClient extends Client {
 
 //////////////////////////////////////////////////////
 function Query(type: string, query: string, ...replacements: Object[]): Promise<any>;
-interface QueryObject{
-    Select : Query;
-    UPDATE : Query;
-    INSERT : Query;
-    DELETE : Query;
+
+function SubQuery(query: string, ...replacements: Object[]): Promise<any>
+
+class QueryObject{
+    public Select : typeof SubQuery;
+    public UPDATE : typeof SubQuery;
+    public INSERT : typeof SubQuery;
+    public DELETE : typeof SubQuery;
 }
 
 interface DBLOGTYPE {
@@ -171,19 +158,18 @@ interface DBLOGTYPE {
     DATABASE_LOG :  "DATABASE_LOG",
 }
 
-interface TableQueryInterface extends QueryInterface {
-    addColumn(tableName: TableName, attributeName: string, dataTypeOrOptions?: DataType | ModelAttributeColumnOptions, options?: QueryInterfaceOptions) : Promise<void>;
+class TableQueryInterface extends QueryInterface {
+    constructor(sequelize: Sequelize);
+    addColumn(tableName: typeof TableName, attributeName: string, dataTypeOrOptions?: DataType | ModelAttributeColumnOptions, options?: QueryInterfaceOptions) : Promise<void>;
     changeColumn(tableName: TableName, attributeName: string, dataTypeOrOptions?: DataType | ModelAttributeColumnOptions, options?: QueryInterfaceOptions) : Promise<void>;
     public getColumns(TableName): Promise<ColumnsDescription>;
     public getTables() : Promise<string[]>;
 }
 
-class DBClient extends BaseClient {
+export class DBClient extends BaseClient {
     public constructor(options: BasicDBClientOptions);
 
-    public Query : Query;
-    public Query : QueryObject;
-
+    public Query : typeof Query | QueryObject;
     public Table : TableQueryInterface;
 
     public set User(user: User);
@@ -196,7 +182,7 @@ class DBClient extends BaseClient {
 
 //////////////////////////////////////////////////////
 
-class AchievementsClient extends DBClient{
+export class AchievementsClient extends DBClient{
     public constructor(options: BasicClientOptions);
 
     public achievementComplete(user: User, id : number) : void;
@@ -212,10 +198,6 @@ class AchievementsClient extends DBClient{
 }
 
 //////////////////////////////////////////////////////
-export type Client = BaseClient;
-export type DBClient = DBClient;
-export type AchievementsClient = AchievementsClient;
-
 
 export interface AutoSharding extends ShardingManager {
     public constructor(options: ShardingManagerOptions);
