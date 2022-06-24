@@ -157,9 +157,7 @@ class BasicClient  extends Client
 	/**
 	 * User
 	 */
-	set User({
-		accentColor, id, tag, username, avatar, banner, bot
-	}){
+	set User({ accentColor, id, tag, username, avatar, banner, bot }){
 		this.Query("UPSERT",
 			`INSERT OR REPLACE INTO "User" (id, accentColor, tag, username, avatar, banner, bot) VALUES(?, ?, ?, ?, ?, ?, ?);`,
 			id, accentColor, tag, username, avatar, banner, bot ? 'Y' : 'N'

@@ -141,6 +141,15 @@ AND EventType = ?
 		const _this = this;
 		const { id, guild} = user;
 
+		_this.Query.UPDATE(
+			`UPDATE AchievementsStatus SET count = AchievementsStatus.count + ? WHERE id = ?  AND EventType = ? AND guild${guild ? " = ?" : ' IS NULL -- ?' }`,
+			count, id, eventType, guild?.id || null, 
+		).then(([, isUpdate]) =>{
+			if(!isUpdate)
+				return _this.Query.INSERT(`INSERT INTO AchievementsStatus (id, EventType, count, guild) VALUES(?, ?, ?, ?);`, id, eventType, count, guild?.id || null, )
+		}).catch(_this.logger.error);
+
+		
 	}
 
 	// 업적 리스트를 가져 옵니다.
