@@ -15,6 +15,7 @@ const tables = {
 			,EventType : ColumnType.CHAR(50) // 업적 이벤트
 			,EventCount : ColumnType.INTEGER(1) // 업적 횟수(요건 만족 회수)
 			,createAt : ColumnType.createAt
+			,isGuild : ColumnType.Bool() // 길드 여부 - 각각의 길드에서 별도로 처리하는지 여부
 			,isDeleted : ColumnType.Bool()
 			,parentId : ColumnType.Snowflake
 		},
@@ -81,6 +82,32 @@ class AchievementsClient extends DBClient {
     }
 
 
+	// 내부 - 연산시 상태값이 이벤트 요건을 충족하는지 확인 합니다.
+	// TODO : 값 삽입 - 모든 업데이트
+	#achievementStateValue(user){
+		const _this = this;
+		_this.Query.SELECT(`
+WITH ach AS ( -- 사용자의 진행도
+	SELECT * FROM AchievementsData 
+	WHERE id = ? AND isDeleted = 'N'
+)
+SELECT (SELECT EXISTS(SELECT * FROM ach WHERE eventID = a.id)) AS comp -- 성공유무
+	, CASE WHEN (a.EventCount <= b.count)THEN TRUE ELSE FALSE END AS success 
+	, a.id , a.name, a.description, a."type", a.EventType, a.EventCount, a.createAt, a.parentId, a.isGuild
+FROM Achievements a
+LEFT JOIN (
+	SELECT * FROM AchievementsStatus WHERE id = ?
+) b
+ON b.EventType = a.EventType 
+WHERE 1=1
+AND comp != 1 -- 이미성공했는지 여부
+AND success = 1 -- 신규로 성공 했는가
+		`, user.id, user.id).then(achievements => {
+			_this.Query.INSERT(` INSERT INTO AchievementsData (id, eventID, guild, isDeleted) VALUES('', 1, '', 'N'); `)	
+		})
+		
+	}
+
 	// 업적 완료 이벤트 - 사용자가 업적을 완료 할 경우
 	achievementComplete(user, achievement_id) { 
 		this.achievementUpdate(user, achievement_id, false);
@@ -137,7 +164,7 @@ AND EventType = ?
 		`, id, guild?.id || null, eventType)
 	}
 
-	achievementStateChange(user, eventType, count) {
+	achievementStateAppend(user, eventType, count) {
 		const _this = this;
 		const { id, guild} = user;
 

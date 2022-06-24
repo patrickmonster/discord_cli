@@ -180,6 +180,10 @@ export class AchievementsClient extends DBClient{
     public achievementCreate(user: User, id : number) : void;
     public achievementDelete(user: User, id : number) : void;
     public achievementUpdate(user: User, id : number, isDeleted : boolean) : void;
+    // 수치값을 조회 합니다
+    public achievementState(user : User, eventType : string) : void;
+    // 기존수치에 값을 가산합니다
+    public achievementStateAppend(user : User, eventType : string, count : number) : void;
     
     public achievement : Achievement; // 생성
     public readonly achievements : Promise<Achievement>; // 조회
