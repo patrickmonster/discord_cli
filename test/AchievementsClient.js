@@ -5,7 +5,8 @@ const AchievementsClient = require('../src/AchievementsClient');
 
 
 const client = new AchievementsClient({
-    intents : [ Intents.FLAGS.DIRECT_MESSAGES ]
+    intents : [ Intents.FLAGS.DIRECT_MESSAGES ],
+    isDBQuery : true,
 });
 
 client.on("ready", ready)

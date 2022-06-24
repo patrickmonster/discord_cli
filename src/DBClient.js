@@ -17,7 +17,7 @@ const tables = {
 		,name : ColumnType.CHAR(100)
 		,type : ColumnType.CHAR(20)
 		,createAt : ColumnType.createAt
-		,isDeleted : ColumnType.Bool
+		,isDeleted : ColumnType.Bool()
 		,guild_id : ColumnType.CHAR(20, 'DM')
 		,parentId : ColumnType.CHAR(20)
 		,editAt : ColumnType.createAt
@@ -35,7 +35,7 @@ const tables = {
 		, name : ColumnType.CHAR(100)
 		, ownerId : ColumnType.CHAR(20)
 		, joinedTimestamp : ColumnType.createAt
-		, isDeleted : ColumnType.Bool
+		, isDeleted : ColumnType.Bool()
 	},
 	ServerLog : {
 		timeAt : ColumnType.createAt
@@ -46,7 +46,7 @@ const tables = {
 	User : {
 		id : ColumnType.id
 		, bot : ColumnType.CHAR(1, 'N')
-		, accentColor : ColumnType.INTEGER
+		, accentColor : ColumnType.INTEGER()
 		, tag : ColumnType.CHAR(200)
 		, username : ColumnType.CHAR(100)
 		, avatar : ColumnType.CHAR(100)
@@ -81,7 +81,7 @@ class BasicClient  extends Client
 				},
 			}).then(out => {
 				if(clientOptions.isDBQuery)
-					_this.insertLog('02','SQL_LOG',`${Date.now().getTime() - startTime.getTime()}ms ${query} ${JSON.stringify(replacements)}`)
+					_this.insertLog('02','SQL_LOG',`${Date.now() - startTime.getTime()}ms] ${query}`)
 				return out;
 			});
         };
@@ -147,10 +147,10 @@ class BasicClient  extends Client
 
 	// 서버 로그에 추가
 	insertLog(type, owner, msg) {
-		this._db.sql("INSERT", 
-			`INSERT INTO ServerLog (owner, msg, "type") VALUES (?, ?, ?)`, 
-			owner, msg, type
-		).catch(this.logger.error);
+		this._db.query(`INSERT INTO ServerLog (owner, msg, "type") VALUES (?, ?, ?)`, {
+			type: QueryTypes.INSERT, 
+			replacements : [owner, msg, type]
+		});
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////

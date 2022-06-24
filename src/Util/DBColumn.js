@@ -20,12 +20,14 @@ module.exports = {
         type : DataTypes.DATE,
         defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    Bool : {
-        type : DataTypes.CHAR(1),
-        defaultValue : 'N',
-        allowNull : false
+    Bool : (defaultValue = 'N')=>{
+        if( typeof defaultValue !== 'boolean' )
+            defaultValue = defaultValue ? 'Y' : 'N';
+        if ( defaultValue != 'N')
+            defaultValue = 'Y';
+        return { type : DataTypes.CHAR(1), defaultValue, allowNull : false }
     },
-    INTEGER : DataTypes.INTEGER,
+    INTEGER : (defaultValue = null)=>({ type : DataTypes.INTEGER, defaultValue }),
     TEXT : DataTypes.TEXT(65535),
     CHAR : (size, defaultValue = null)=>({ type : DataTypes.CHAR(size), defaultValue }),
 }

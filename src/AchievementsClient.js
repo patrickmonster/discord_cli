@@ -13,19 +13,19 @@ const tables = {
 			,description : ColumnType.CHAR(1000) // 업적이름
 			,type : ColumnType.CHAR(20) // 업적 타입
 			,EventType : ColumnType.CHAR(50) // 업적 이벤트
-			,EventCount : { ...ColumnType.INTEGER, defaultValue : 1 } // 업적 횟수(요건 만족 회수)
+			,EventCount : ColumnType.INTEGER(1) // 업적 횟수(요건 만족 회수)
 			,createAt : ColumnType.createAt
-			,isDeleted : ColumnType.Bool
+			,isDeleted : ColumnType.Bool()
 			,parentId : ColumnType.Snowflake
 		},
 	],
 	AchievementsData : [
 		{ // 업적 기록 - 클리어 기록
 			id : ColumnType.id
-			,eventID : ColumnType.INTEGER
+			,eventID : ColumnType.INTEGER(1)
 			,guild : ColumnType.Snowflake
 			,createAt : ColumnType.createAt
-			,isDeleted : ColumnType.Bool
+			,isDeleted : ColumnType.Bool()
 		},
 		{
 			uniqueKeys: {
@@ -35,6 +35,23 @@ const tables = {
 			}
 		}
 	],
+	AchievementsStatus: [
+		{// 업적 진행도
+			id : ColumnType.id // 소유주
+			,EventType : ColumnType.CHAR(50) // 업적 이벤트
+			,count : ColumnType.INTEGER() // 진행 횟수
+			,guild : ColumnType.Snowflake
+			// 
+		},
+		{
+			uniqueKeys: {
+				achievementsStatusKey: {
+					fields: ['id', 'EventType', "guild"]
+				}
+			},
+			fields : [ "guild", "EventType" ],
+		}
+	]
 }
 /**
  * 업적 클라이언트
@@ -100,6 +117,30 @@ class AchievementsClient extends DBClient {
 
 			return {};
 		}).catch(this.logger.error);
+	}
+
+	// 사용자 업적 상태를 불러옴
+	achievementState(user, eventType){
+		const _this = this;
+		const { id, guild} = user;
+
+		return _this.Query.SELECT(`
+SELECT 
+	id
+	, EventType
+	, count
+	, guild
+FROM AchievementsStatus
+WHERE id = ?
+AND guild = ?
+AND EventType = ?
+		`, id, guild?.id || null, eventType)
+	}
+
+	achievementStateChange(user, eventType, count) {
+		const _this = this;
+		const { id, guild} = user;
+
 	}
 
 	// 업적 리스트를 가져 옵니다.
