@@ -6,6 +6,27 @@ const ColumnType = require("./Util/DBColumn")
 // ----------------------------------------------------------------
 // 업적 - 리더보드형
 const tables = {
+
+	/// 사용자 포인트 관련
+	UserPoint : [ // 사용자 포인트
+		{ // 업적
+			id : ColumnType.id
+			,point : ColumnType.INTEGER(0) // 포인트
+			,createAt : ColumnType.createAt // 
+		},
+	],
+	UserPointLog : [ // 사용자 포인트 로그
+		{ // 업적
+			id : ColumnType.idx
+			, user : ColumnType.Snowflake // 유저
+			,description : ColumnType.CHAR(1000) // 설명
+			,isDeleted : ColumnType.Bool() // 취소여부
+			,createAt : ColumnType.createAt
+			,point : ColumnType.INTEGER(0) // 지급된 포인트
+		},
+	],
+
+	/// 업적관련
 	Achievements : [
 		{ // 업적
 			id : ColumnType.idx
@@ -15,6 +36,7 @@ const tables = {
 			,EventType : ColumnType.CHAR(50) // 업적 이벤트
 			,EventCount : ColumnType.INTEGER(1) // 업적 횟수(요건 만족 회수)
 			,createAt : ColumnType.createAt
+			,isGuild : ColumnType.Bool() // 길드 여부 - 각각의 길드에서 별도로 처리하는지 여부
 			,isDeleted : ColumnType.Bool()
 			,parentId : ColumnType.Snowflake
 		},
@@ -66,20 +88,46 @@ class AchievementsClient extends DBClient {
         super(options);
 		const _this = this;
 
-		this.once("ready", () =>{ // 규칙에 필요한 테이블 생성
-			const t_interface = _this.Table;
-			t_interface.getTables().then(ts =>{
-				const tmp_tables = Object.keys(tables).filter(t => !ts.includes(t));
-				for (const table of tmp_tables){ 
-					const [tableObject, keys] = tables[table];
-					t_interface.createTable(table, tableObject, keys).then(() =>{
-						console.log("테이블 생성 -", table);
-					}).catch(console.error);
-				}
-			}).catch(_this.logger.error);
-		})
+		// this.once("ready", () =>{ // 규칙에 필요한 테이블 생성
+		const t_interface = _this.Table;
+		t_interface.getTables().then(ts =>{
+			const tmp_tables = Object.keys(tables).filter(t => !ts.includes(t));
+			for (const table of tmp_tables){ 
+				const [tableObject, keys] = tables[table];
+				t_interface.createTable(table, tableObject, keys).then(() =>{
+					console.log("테이블 생성 -", table);
+				}).catch(console.error);
+			}
+		}).catch(_this.logger.error);
+		// })
     }
 
+
+	// 내부 - 연산시 상태값이 이벤트 요건을 충족하는지 확인 합니다.
+	// TODO : 값 삽입 - 모든 업데이트
+	#achievementStateValue(user){
+		const _this = this;
+		_this.Query.SELECT(`
+WITH ach AS ( -- 사용자의 진행도
+	SELECT * FROM AchievementsData 
+	WHERE id = ? AND isDeleted = 'N'
+)
+SELECT (SELECT EXISTS(SELECT * FROM ach WHERE eventID = a.id)) AS comp -- 성공유무
+	, CASE WHEN (a.EventCount <= b.count)THEN TRUE ELSE FALSE END AS success 
+	, a.id , a.name, a.description, a."type", a.EventType, a.EventCount, a.createAt, a.parentId, a.isGuild
+FROM Achievements a
+LEFT JOIN (
+	SELECT * FROM AchievementsStatus WHERE id = ?
+) b
+ON b.EventType = a.EventType 
+WHERE 1=1
+AND comp != 1 -- 이미성공했는지 여부
+AND success = 1 -- 신규로 성공 했는가
+		`, user.id, user.id).then(achievements => {
+			_this.Query.INSERT(` INSERT INTO AchievementsData (id, eventID, guild, isDeleted) VALUES('', 1, '', 'N'); `)	
+		})
+		
+	}
 
 	// 업적 완료 이벤트 - 사용자가 업적을 완료 할 경우
 	achievementComplete(user, achievement_id) { 
@@ -137,7 +185,7 @@ AND EventType = ?
 		`, id, guild?.id || null, eventType)
 	}
 
-	achievementStateChange(user, eventType, count) {
+	achievementStateAppend(user, eventType, count) {
 		const _this = this;
 		const { id, guild} = user;
 
@@ -238,6 +286,78 @@ ${user instanceof GuildMember ? "AND ad.guild = ?" : ""}
 				achievement : comp
 			};
 		}).catch(_this.logger.error);
+	}
+
+	/////////////////////////////////////////////////////////////////
+
+	// 포인트 랭킹 조회 - 상위 50명
+	get Point(){
+		const _this = this;
+		return _this.Query.SELECT(`
+SELECT * 
+FROM UserPoint
+WHERE 1=1
+LIMIT 50
+ORDER BY point DESC
+		`).catch(_this.logger.error);
+	}
+
+	// 사용자 포인트를 가신/감산 합니다
+	set Point({
+		id, point, description
+	}){
+		const _this = this;
+		_this.Query.INSERT(`
+INSERT INTO UserPointLog (user, point, description)
+VALUES(?, ?, ?);
+		`, id, point, description).then(_=>
+			_this.Query.UPDATE( `UPDATE UserPoint SET point = UserPoint.point + ? WHERE id = ?`, point, id ).then(([, isUpdate]) =>{
+				if(!isUpdate)
+					return _this.Query.INSERT(`INSERT INTO UserPoint (id, point) VALUES(?, ?);`, id, point)
+			}).catch(_this.logger.error)
+		)
+	}
+
+	// 사용자 포인트 로그를 조회합니다
+	getPointLog(id = 0, idx = 0, size = 100){
+		const _this = this;
+		return _this.Query.SELECT(`
+SELECT *
+FROM UserPointLog 
+${id ? '-- ' : ''} WHERE id = ?
+LIMIT ?, ?
+		`, id, idx * size, size).then(out=> out.map(o=> {
+			o.isDeleted = o.isDeleted == 'N';
+			return o;
+		}));
+	}
+
+	// 사용자 포인트를 조회합니다
+	getPoint(id = 0){
+		const _this = this;
+		return _this.Query.SELECT(`
+SELECT * FROM UserPoint WHERE id = ?
+		`, id).then(([user])=> user);
+	}
+
+	// 사용자 포인트를 취소합니다. (지급 정보를 롤백합니다)
+	set DeletePoint({
+		id, idx, description
+	}){
+		const _this = this;
+
+		if(!id && !idx)
+			return _this.logger.error("필수값(id, idx)가 누락되었습니다.");
+
+		// 포인트 로그 조회 및 업데이트
+		_this.Query.SELECT(`SELECT point FROM UserPointLog WHERE user = ? AND id = ? AND isDeleted = 'N'`, id, idx).then(([log])=>{
+			if(!log)
+				return _this.logger.error("포인트 로그 정보가 일치하지 않거나, 없습니다!");
+				// throw new Error();
+			const { point } = log;
+			_this.Point = { id, point : point * -1, description : `${idx}]${description || " -- "}`}; // 포인트 롤백연산
+			_this.Query.UPDATE( `UPDATE UserPointLog SET isDeleted = 'Y' WHERE id = ?`, idx  ).catch(_this.logger.error); // 지급이력 비 활성화
+		});
 	}
 }
 

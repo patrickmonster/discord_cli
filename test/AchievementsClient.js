@@ -38,7 +38,7 @@ function ready(){
 
     setTimeout(function(){
         // client.achievementComplete({id : "00000000000000000000"}, 6);
-        client.achievementStateChange({id : "1", guild : {id : 1}}, 1, 10)
+        client.achievementStateAppend({id : "1", guild : {id : 1}}, 1, 10)
         client.achievementDelete({id : "00000000000000000000"}, 6);
 
         // client.achievement.then(achievement => {

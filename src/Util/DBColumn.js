@@ -21,10 +21,6 @@ module.exports = {
         defaultValue : Sequelize.literal('CURRENT_TIMESTAMP'),
     },
     Bool : (defaultValue = 'N')=>{
-        if( typeof defaultValue !== 'boolean' )
-            defaultValue = defaultValue ? 'Y' : 'N';
-        if ( defaultValue != 'N')
-            defaultValue = 'Y';
         return { type : DataTypes.CHAR(1), defaultValue, allowNull : false }
     },
     INTEGER : (defaultValue = null)=>({ type : DataTypes.INTEGER, defaultValue }),
