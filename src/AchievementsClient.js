@@ -88,18 +88,18 @@ class AchievementsClient extends DBClient {
         super(options);
 		const _this = this;
 
-		this.once("ready", () =>{ // 규칙에 필요한 테이블 생성
-			const t_interface = _this.Table;
-			t_interface.getTables().then(ts =>{
-				const tmp_tables = Object.keys(tables).filter(t => !ts.includes(t));
-				for (const table of tmp_tables){ 
-					const [tableObject, keys] = tables[table];
-					t_interface.createTable(table, tableObject, keys).then(() =>{
-						console.log("테이블 생성 -", table);
-					}).catch(console.error);
-				}
-			}).catch(_this.logger.error);
-		})
+		// this.once("ready", () =>{ // 규칙에 필요한 테이블 생성
+		const t_interface = _this.Table;
+		t_interface.getTables().then(ts =>{
+			const tmp_tables = Object.keys(tables).filter(t => !ts.includes(t));
+			for (const table of tmp_tables){ 
+				const [tableObject, keys] = tables[table];
+				t_interface.createTable(table, tableObject, keys).then(() =>{
+					console.log("테이블 생성 -", table);
+				}).catch(console.error);
+			}
+		}).catch(_this.logger.error);
+		// })
     }
 
 
