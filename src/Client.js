@@ -31,8 +31,8 @@ const formattedDate = _ => {
 // extends EventEmitter
 class BasicClient 
     extends 
-        // Client
-        EventEmitter
+        Client
+        // EventEmitter
     {
     /**
      * 
