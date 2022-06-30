@@ -332,6 +332,14 @@ LIMIT ?, ?
 		}));
 	}
 
+	// 사용자 포인트를 조회합니다
+	getPoint(id = 0){
+		const _this = this;
+		return _this.Query.SELECT(`
+SELECT * FROM UserPoint WHERE id = ?
+		`, id).then(([user])=> user);
+	}
+
 	// 사용자 포인트를 취소합니다. (지급 정보를 롤백합니다)
 	set DeletePoint({
 		id, idx, description

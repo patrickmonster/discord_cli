@@ -105,6 +105,22 @@ export interface AchievementBord {
     achievemen : AchievementUser[]
 }
 
+export interface UserPoint {
+    id : Snowflake;
+    point : number;
+    createAt : Date;
+}
+
+export interface UserPointLog {
+    id : number;
+    user : Snowflake;
+    description : string;
+    isDeleted : boolean;
+    createAt : Date;
+    point : number;
+}
+
+
 //////////////////////////////////////////////////////
 
 export function LoadCommands(target: string): GetCommand;
@@ -188,8 +204,17 @@ export class AchievementsClient extends DBClient{
     public achievement : Achievement; // 생성
     public readonly achievements : Promise<Achievement>; // 조회
 
-    public getAchievements(user: User) : Promise<AchievementUser>;
-    public getReaderBord(user: User) : Promise<AchievementBord>;
+    public getAchievements(user: User) : Promise<AchievementUser>;// 사용자의 모든 업적을 가져 옵니다.
+    public getReaderBord(user: User) : Promise<AchievementBord>;// 사용자의 모든 업적을 리더보드로 나타 냅니다.
+
+    /////////////////////////////////////////////////////////////////
+
+    public get Point() : Promise<UserPoint[]>;// 포인트 랭킹 조회 - 상위 50명
+    public set Point(value : UserPoint) : void;// 사용자 포인트를 가신/감산 합니다
+    public set DeletePoint(value : { id : number, idx : number, description : string}) : void;// 사용자 포인트를 취소합니다. (지급 정보를 롤백합니다)
+
+    public getPoint(user: number) : Promise<UserPoint[]>; // 단일 사용자의 포인트를 조회 합니다.
+    public getPointLog(id : number, idx : number, size : number) : Promise<UserPointLog[]>;// 사용자 포인트 로그를 조회합니다
 }
 
 //////////////////////////////////////////////////////

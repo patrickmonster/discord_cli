@@ -119,9 +119,42 @@ Disocrd - Commands update tool
 ? 봇 토큰을 입력 해 주세요! [hidden]
 ```
 <br><br>
+## 사용자 포인트 관리 시스템 내장
+
+사용자 포인트를 추가하는 예시
+```
+const client = new AchievementsClient({ intents : ... });
+client.once('ready', ()=>{
+  client.Point = {
+    id : '00000000000000000000' // discord 사용자 고유 id
+    , point : 100 // 포인트
+    , description : "테스트 포인트" // 포인트 로그 정보
+  }
+});
+```
+Top.50 포인트를 조회합니다.
+```
+client.Point.then(users =>{
+  /// other code
+})
+```
+특정 사용자의 포인트를 환불합니다
+```
+client.DeletePoint = {
+  id : '00000000000000000000' // user id
+  , idx : 1 // 반환할 포인트의 로그 (해당 내용은 getPointLog 를 통해서 조회가 가능 하다. - idx와 id가 일치해야 제거됨)
+  , description : '테스트 포인트 반환' // 반환시 남겨질 추가 로그
+}
+```
+
+<br><br>
 
 ---
 ### 변경기록
+
+1.2.0
+> 사용자 포인트 관리 추가</br>
+> 테이블 생성타임 변경 - 클라이언트 준비전
 
 1.1.9
 > DB 타입형 추가
