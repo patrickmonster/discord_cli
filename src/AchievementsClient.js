@@ -6,6 +6,27 @@ const ColumnType = require("./Util/DBColumn")
 // ----------------------------------------------------------------
 // 업적 - 리더보드형
 const tables = {
+
+	/// 사용자 포인트 관련
+	UserPoint : [ // 사용자 포인트
+		{ // 업적
+			id : ColumnType.id
+			,point : ColumnType.INTEGER(0) // 포인트
+			,createAt : ColumnType.createAt // 
+		},
+	],
+	UserPointLog : [ // 사용자 포인트 로그
+		{ // 업적
+			id : ColumnType.idx
+			, user : ColumnType.Snowflake // 유저
+			,description : ColumnType.CHAR(1000) // 설명
+			,isDeleted : ColumnType.Bool() // 취소여부
+			,createAt : ColumnType.createAt
+			,point : ColumnType.INTEGER(0) // 지급된 포인트
+		},
+	],
+
+	/// 업적관련
 	Achievements : [
 		{ // 업적
 			id : ColumnType.idx
@@ -265,6 +286,69 @@ ${user instanceof GuildMember ? "AND ad.guild = ?" : ""}
 				achievement : comp
 			};
 		}).catch(_this.logger.error);
+	}
+
+	/////////////////////////////////////////////////////////////////
+
+	// 포인트 랭킹 조회 - 상위 50명
+	get Point(){
+		const _this = this;
+		return _this.Query.SELECT(`
+SELECT * 
+FROM UserPoint
+WHERE 1=1
+LIMIT 50
+ORDER BY point DESC
+		`).catch(_this.logger.error);
+	}
+
+	// 사용자 포인트를 가신/감산 합니다
+	set Point({
+		id, point, description
+	}){
+		const _this = this;
+		_this.Query.INSERT(`
+INSERT INTO UserPointLog (user, point, description)
+VALUES(?, ?, ?);
+		`, id, point, description).then(_=>
+			_this.Query.UPDATE( `UPDATE UserPoint SET point = UserPoint.point + ? WHERE id = ?`, point, id ).then(([, isUpdate]) =>{
+				if(!isUpdate)
+					return _this.Query.INSERT(`INSERT INTO UserPoint (id, point) VALUES(?, ?);`, id, point)
+			}).catch(_this.logger.error)
+		)
+	}
+
+	// 사용자 포인트 로그를 조회합니다
+	getPointLog(id = 0, idx = 0, size = 100){
+		const _this = this;
+		return _this.Query.SELECT(`
+SELECT *
+FROM UserPointLog 
+${id ? '-- ' : ''} WHERE id = ?
+LIMIT ?, ?
+		`, id, idx * size, size).then(out=> out.map(o=> {
+			o.isDeleted = o.isDeleted == 'N';
+			return o;
+		}));
+	}
+
+	// 사용자 포인트를 취소합니다. (지급 정보를 롤백합니다)
+	set DeletePoint({
+		id, idx, description
+	}){
+		const _this = this;
+
+		if(!id && !idx)
+			throw new Error("필수값(id, idx)가 누락되었습니다.");
+
+		// 포인트 로그 조회 및 업데이트
+		_this.Query.SELECT(`SELECT point FROM UserPointLog WHERE id = ? AND idx = ? AND isDeleted = 'N'`, id, idx).then(([log])=>{
+			if(!log)
+				throw new Error("포인트 로그 정보가 일치하지 않거나, 없습니다!");
+			const { point } = log;
+			_this.Point = { id, point : point * -1, description : `${idx}]${description}`};
+			_this.Query.UPDATE( `UPDATE UserPointLog SET point = UserPoint.point + ?, isDeleted = 'Y' WHERE id = ?`, point * -1, id,  ).catch(_this.logger.error);
+		});
 	}
 }
 
