@@ -342,12 +342,12 @@ LIMIT ?, ?
 			throw new Error("필수값(id, idx)가 누락되었습니다.");
 
 		// 포인트 로그 조회 및 업데이트
-		_this.Query.SELECT(`SELECT point FROM UserPointLog WHERE id = ? AND idx = ? AND isDeleted = 'N'`, id, idx).then(([log])=>{
+		_this.Query.SELECT(`SELECT point FROM UserPointLog WHERE user = ? AND id = ? AND isDeleted = 'N'`, id, idx).then(([log])=>{
 			if(!log)
 				throw new Error("포인트 로그 정보가 일치하지 않거나, 없습니다!");
 			const { point } = log;
-			_this.Point = { id, point : point * -1, description : `${idx}]${description}`};
-			_this.Query.UPDATE( `UPDATE UserPointLog SET point = UserPoint.point + ?, isDeleted = 'Y' WHERE id = ?`, point * -1, id,  ).catch(_this.logger.error);
+			_this.Point = { id, point : point * -1, description : `${idx}]${description || " -- "}`}; // 포인트 롤백연산
+			_this.Query.UPDATE( `UPDATE UserPointLog SET isDeleted = 'Y' WHERE id = ?`, idx  ).catch(_this.logger.error); // 지급이력 비 활성화
 		});
 	}
 }
